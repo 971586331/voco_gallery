@@ -145,54 +145,97 @@ ApplicationWindow {
         height: window.height
         interactive: stackView.depth === 1
 
-        ListView {
-            id: listView
-
-            focus: true
-            currentIndex: -1
-            anchors.fill: parent
-
-            delegate: ItemDelegate {
-                width: parent.width
-                text: model.title
-                highlighted: ListView.isCurrentItem
-                onClicked: {
-                    listView.currentIndex = index
-                    stackView.push(model.source)
-                    drawer.close()
+        Column
+        {
+            spacing: 10
+            Rectangle
+            {
+                id: drawer_rect1
+                width: drawer.width
+                height: window.height / 5
+                Image {
+                    id: drawer_logo
+                    width: drawer_rect1.height / 2
+                    height: drawer_rect1.height / 2
+                    anchors.left: drawer_rect1.left
+                    anchors.leftMargin: 30
+                    anchors.top: drawer_rect1.top
+                    anchors.topMargin: 30
+                    fillMode: Image.PreserveAspectFit
+                    source: "qrc:/images/user.png"
                 }
             }
 
-            model: ListModel {
-                ListElement { title: "BusyIndicator"; source: "qrc:/pages/BusyIndicatorPage.qml" }
-                ListElement { title: "Button"; source: "qrc:/pages/ButtonPage.qml" }
-                ListElement { title: "CheckBox"; source: "qrc:/pages/CheckBoxPage.qml" }
-                ListElement { title: "ComboBox"; source: "qrc:/pages/ComboBoxPage.qml" }
-                ListElement { title: "DelayButton"; source: "qrc:/pages/DelayButtonPage.qml" }
-                ListElement { title: "Dial"; source: "qrc:/pages/DialPage.qml" }
-                ListElement { title: "Dialog"; source: "qrc:/pages/DialogPage.qml" }
-                ListElement { title: "Delegates"; source: "qrc:/pages/DelegatePage.qml" }
-                ListElement { title: "Frame"; source: "qrc:/pages/FramePage.qml" }
-                ListElement { title: "GroupBox"; source: "qrc:/pages/GroupBoxPage.qml" }
-                ListElement { title: "PageIndicator"; source: "qrc:/pages/PageIndicatorPage.qml" }
-                ListElement { title: "ProgressBar"; source: "qrc:/pages/ProgressBarPage.qml" }
-                ListElement { title: "RadioButton"; source: "qrc:/pages/RadioButtonPage.qml" }
-                ListElement { title: "RangeSlider"; source: "qrc:/pages/RangeSliderPage.qml" }
-                ListElement { title: "ScrollBar"; source: "qrc:/pages/ScrollBarPage.qml" }
-                ListElement { title: "ScrollIndicator"; source: "qrc:/pages/ScrollIndicatorPage.qml" }
-                ListElement { title: "Slider"; source: "qrc:/pages/SliderPage.qml" }
-                ListElement { title: "SpinBox"; source: "qrc:/pages/SpinBoxPage.qml" }
-                ListElement { title: "StackView"; source: "qrc:/pages/StackViewPage.qml" }
-                ListElement { title: "SwipeView"; source: "qrc:/pages/SwipeViewPage.qml" }
-                ListElement { title: "Switch"; source: "qrc:/pages/SwitchPage.qml" }
-                ListElement { title: "TabBar"; source: "qrc:/pages/TabBarPage.qml" }
-                ListElement { title: "TextArea"; source: "qrc:/pages/TextAreaPage.qml" }
-                ListElement { title: "TextField"; source: "qrc:/pages/TextFieldPage.qml" }
-                ListElement { title: "ToolTip"; source: "qrc:/pages/ToolTipPage.qml" }
-                ListElement { title: "Tumbler"; source: "qrc:/pages/TumblerPage.qml" }
+            Rectangle
+            {
+                id: drawer_rect2
+                width: drawer.width
+                height: window.height / 10
+                Label
+                {
+                    width: drawer_rect2.width
+                    anchors.left: drawer_rect2.left
+                    anchors.leftMargin: 10
+                    anchors.top: drawer_rect2.top
+                    text: qsTr("用户名：xxx")
+                }
             }
 
-            ScrollIndicator.vertical: ScrollIndicator { }
+            Rectangle
+            {
+                width: drawer.width
+                height: window.height - (drawer_rect2.y + drawer_rect2.height)
+                ListView {
+                    id: listView
+
+                    focus: true
+                    currentIndex: -1
+                    anchors.fill: parent
+
+                    delegate: ItemDelegate {
+                        width: parent.width
+                        text: model.title
+                        highlighted: ListView.isCurrentItem
+                        onClicked: {
+                            listView.currentIndex = index
+                            stackView.push(model.source)
+                            drawer.close()
+                        }
+                    }
+
+                    model: ListModel {
+                        ListElement { title: "连接设备"; source: "qrc:/mypages/connect.qml" }
+//                        ListElement { title: "BusyIndicator"; source: "qrc:/pages/BusyIndicatorPage.qml" }
+//                        ListElement { title: "Button"; source: "qrc:/pages/ButtonPage.qml" }
+//                        ListElement { title: "CheckBox"; source: "qrc:/pages/CheckBoxPage.qml" }
+//                        ListElement { title: "ComboBox"; source: "qrc:/pages/ComboBoxPage.qml" }
+//                        ListElement { title: "DelayButton"; source: "qrc:/pages/DelayButtonPage.qml" }
+//                        ListElement { title: "Dial"; source: "qrc:/pages/DialPage.qml" }
+//                        ListElement { title: "Dialog"; source: "qrc:/pages/DialogPage.qml" }
+//                        ListElement { title: "Delegates"; source: "qrc:/pages/DelegatePage.qml" }
+//                        ListElement { title: "Frame"; source: "qrc:/pages/FramePage.qml" }
+//                        ListElement { title: "GroupBox"; source: "qrc:/pages/GroupBoxPage.qml" }
+//                        ListElement { title: "PageIndicator"; source: "qrc:/pages/PageIndicatorPage.qml" }
+//                        ListElement { title: "ProgressBar"; source: "qrc:/pages/ProgressBarPage.qml" }
+//                        ListElement { title: "RadioButton"; source: "qrc:/pages/RadioButtonPage.qml" }
+//                        ListElement { title: "RangeSlider"; source: "qrc:/pages/RangeSliderPage.qml" }
+//                        ListElement { title: "ScrollBar"; source: "qrc:/pages/ScrollBarPage.qml" }
+//                        ListElement { title: "ScrollIndicator"; source: "qrc:/pages/ScrollIndicatorPage.qml" }
+//                        ListElement { title: "Slider"; source: "qrc:/pages/SliderPage.qml" }
+//                        ListElement { title: "SpinBox"; source: "qrc:/pages/SpinBoxPage.qml" }
+//                        ListElement { title: "StackView"; source: "qrc:/pages/StackViewPage.qml" }
+//                        ListElement { title: "SwipeView"; source: "qrc:/pages/SwipeViewPage.qml" }
+//                        ListElement { title: "Switch"; source: "qrc:/pages/SwitchPage.qml" }
+//                        ListElement { title: "TabBar"; source: "qrc:/pages/TabBarPage.qml" }
+//                        ListElement { title: "TextArea"; source: "qrc:/pages/TextAreaPage.qml" }
+//                        ListElement { title: "TextField"; source: "qrc:/pages/TextFieldPage.qml" }
+//                        ListElement { title: "ToolTip"; source: "qrc:/pages/ToolTipPage.qml" }
+//                        ListElement { title: "Tumbler"; source: "qrc:/pages/TumblerPage.qml" }
+                    }
+
+                    ScrollIndicator.vertical: ScrollIndicator { }
+                }
+            }
         }
     }
 

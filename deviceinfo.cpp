@@ -1,9 +1,9 @@
-/****************************************************************************
+/***************************************************************************
 **
 ** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
-** This file is part of the examples of the Qt Toolkit.
+** This file is part of the examples of the QtBluetooth module of the Qt Toolkit.
 **
 ** $QT_BEGIN_LICENSE:BSD$
 ** Commercial License Usage
@@ -48,38 +48,43 @@
 **
 ****************************************************************************/
 
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
-#include <QSettings>
-#include <QQuickStyle>
-#include <QIcon>
-#include "mainwindow.h"
+#include "deviceinfo.h"
+#include <QBluetoothAddress>
+#include <QBluetoothUuid>
 
-int main(int argc, char *argv[])
+DeviceInfo::DeviceInfo(const QBluetoothDeviceInfo &info):
+    m_device(info)
 {
-    QGuiApplication::setApplicationName("Gallery");
-    QGuiApplication::setOrganizationName("QtProject");
-    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+}
 
-    QGuiApplication app(argc, argv);
+QBluetoothDeviceInfo DeviceInfo::getDevice() const
+{
+    return m_device;
+}
 
-    QIcon::setThemeName("gallery");
+QString DeviceInfo::getName() const
+{
+#ifdef SIMULATOR
+    return "Demo device";
+#else
+    return m_device.name();
+#endif
+}
 
-//    QSettings settings;
-//    QString style = QQuickStyle::name();
-//    if (!style.isEmpty())
-//        settings.setValue("style", style);
-//    else
-//        QQuickStyle::setStyle(settings.value("style").toString());
+QString DeviceInfo::getAddress() const
+{
+#ifdef SIMULATOR
+    return "00:11:22:33:44:55";
+#elif defined Q_OS_DARWIN
+    // workaround for Core Bluetooth:
+    return m_device.deviceUuid().toString();
+#else
+    return m_device.address().toString();
+#endif
+}
 
-//    QQmlApplicationEngine engine;
-//    engine.rootContext()->setContextProperty("availableStyles", QQuickStyle::availableStyles());
-//    engine.load(QUrl("qrc:/main.qml"));
-//    if (engine.rootObjects().isEmpty())
-//        return -1;
-
-    new mainwindow();
-
-    return app.exec();
+void DeviceInfo::setDevice(const QBluetoothDeviceInfo &device)
+{
+    m_device = device;
+    emit deviceChanged();
 }

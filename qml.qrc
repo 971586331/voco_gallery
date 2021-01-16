@@ -53,5 +53,7 @@
         <file>pages/TextFieldPage.qml</file>
         <file>pages/ToolTipPage.qml</file>
         <file>pages/TumblerPage.qml</file>
+        <file>images/user.png</file>
+        <file>mypages/connect.qml</file>
     </qresource>
 </RCC>

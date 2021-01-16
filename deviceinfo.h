@@ -1,9 +1,9 @@
-/****************************************************************************
+/***************************************************************************
 **
 ** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
-** This file is part of the examples of the Qt Toolkit.
+** This file is part of the examples of the QtBluetooth module of the Qt Toolkit.
 **
 ** $QT_BEGIN_LICENSE:BSD$
 ** Commercial License Usage
@@ -48,38 +48,32 @@
 **
 ****************************************************************************/
 
-#include <QGuiApplication>
-#include <QQmlApplicationEngine>
-#include <QQmlContext>
-#include <QSettings>
-#include <QQuickStyle>
-#include <QIcon>
-#include "mainwindow.h"
+#ifndef DEVICEINFO_H
+#define DEVICEINFO_H
 
-int main(int argc, char *argv[])
+#include <QString>
+#include <QObject>
+#include <QBluetoothDeviceInfo>
+
+class DeviceInfo: public QObject
 {
-    QGuiApplication::setApplicationName("Gallery");
-    QGuiApplication::setOrganizationName("QtProject");
-    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    Q_OBJECT
+    Q_PROPERTY(QString deviceName READ getName NOTIFY deviceChanged)
+    Q_PROPERTY(QString deviceAddress READ getAddress NOTIFY deviceChanged)
 
-    QGuiApplication app(argc, argv);
+public:
+    DeviceInfo(const QBluetoothDeviceInfo &device);
 
-    QIcon::setThemeName("gallery");
+    void setDevice(const QBluetoothDeviceInfo &device);
+    QString getName() const;
+    QString getAddress() const;
+    QBluetoothDeviceInfo getDevice() const;
 
-//    QSettings settings;
-//    QString style = QQuickStyle::name();
-//    if (!style.isEmpty())
-//        settings.setValue("style", style);
-//    else
-//        QQuickStyle::setStyle(settings.value("style").toString());
+signals:
+    void deviceChanged();
 
-//    QQmlApplicationEngine engine;
-//    engine.rootContext()->setContextProperty("availableStyles", QQuickStyle::availableStyles());
-//    engine.load(QUrl("qrc:/main.qml"));
-//    if (engine.rootObjects().isEmpty())
-//        return -1;
+private:
+    QBluetoothDeviceInfo m_device;
+};
 
-    new mainwindow();
-
-    return app.exec();
-}
+#endif // DEVICEINFO_H
