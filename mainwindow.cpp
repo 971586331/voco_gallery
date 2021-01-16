@@ -14,13 +14,22 @@ mainwindow::mainwindow(QObject *parent) : QObject(parent)
     else
         QQuickStyle::setStyle(settings.value("style").toString());
 
-    Bluetooth * buletooth = new Bluetooth();
-
     g_qmlEngine = new QQmlApplicationEngine(this);
-    g_qmlEngine->rootContext()->setContextProperty("cpp_interface", this);
-    g_qmlEngine->rootContext()->setContextProperty("buletooth", buletooth);
-    g_qmlEngine->rootContext()->setContextProperty("availableStyles", QQuickStyle::availableStyles());
     QQmlComponent lv_component(g_qmlEngine, QUrl(QStringLiteral("qrc:/main.qml")));
     g_rootObject = lv_component.create();
     g_rootObject->setParent(this);
+
+    Bluetooth * buletooth = new Bluetooth(g_rootObject);
+    g_qmlEngine->rootContext()->setContextProperty("mainwindow", this);
+    g_qmlEngine->rootContext()->setContextProperty("buletooth", buletooth);
+    g_qmlEngine->rootContext()->setContextProperty("availableStyles", QQuickStyle::availableStyles());
+}
+
+int index = 0;
+void mainwindow::button_test()
+{
+    qDebug("button_test()");
+
+    g_rootObject->setProperty("gv_name",index);
+    index ++;
 }

@@ -7,7 +7,7 @@
 #include <QBluetoothDeviceDiscoveryAgent>
 #include <deviceinfo.h>
 
-Bluetooth::Bluetooth()
+Bluetooth::Bluetooth(QObject *obj) : g_rootObject(obj)
 {
 
     m_localDevice = new QBluetoothLocalDevice();
@@ -47,6 +47,7 @@ void Bluetooth::ble_start_scan()
 {
     qDebug() << "run ble_start_scan()";
     discoveryAgent->start();
+    g_rootObject->setProperty("scan_state", "正在扫描...");
 }
 
 /**
@@ -94,7 +95,7 @@ void Bluetooth::slot_device_finished()
 {
     qDebug() << "scan ok!";
     ble_stop_scan();
-
+    g_rootObject->setProperty("scan_state", "扫描完成");
 }
 
 /**

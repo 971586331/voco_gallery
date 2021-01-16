@@ -70,7 +70,11 @@ Page {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment: Qt.AlignHCenter
-                text: qsTr("点击按钮开始寻找设备")
+                text: scan_state
+                onTextChanged:
+                {
+//                    console.log("text = ", text)
+                }
             }
         }
 

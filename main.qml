@@ -62,6 +62,8 @@ ApplicationWindow {
     visible: true
     title: "Qt Quick Controls 2"
 
+    property string scan_state : qsTr("点击按钮开始寻找设备")
+
     Settings {
         id: settings
         property string style: "Default"
@@ -256,7 +258,17 @@ ApplicationWindow {
                 source: "images/qt-logo.png"
             }
 
+            Button
+            {
+                id: button1
+                text: "test"
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked: mainwindow.button_test()
+            }
+
             Label {
+                id: main_label
                 text: "Qt Quick Controls 2 provides a set of controls that can be used to build complete interfaces in Qt Quick."
                 anchors.margins: 20
                 anchors.top: logo.bottom

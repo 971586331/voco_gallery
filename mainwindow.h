@@ -13,6 +13,8 @@ public:
     QQmlApplicationEngine *g_qmlEngine;
     QObject *g_rootObject;
 
+    Q_INVOKABLE void button_test();
+
 signals:
 
 };

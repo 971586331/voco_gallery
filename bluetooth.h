@@ -16,7 +16,7 @@ class Bluetooth : public QObject
     Q_PROPERTY(QVariant devices READ get_devices_list NOTIFY devicesChanged)
 
 public:
-    Bluetooth();
+    Bluetooth(QObject *object);
 
     Q_INVOKABLE QString get_local_name();
     Q_INVOKABLE QString get_local_address();
@@ -27,8 +27,7 @@ public:
 
     QList<QObject*> m_devices;
 
-    QQmlApplicationEngine *gp_qmlEngine;
-    QObject *gp_rootObject;
+    QObject *g_rootObject;
 
 signals:
     void devicesChanged();
