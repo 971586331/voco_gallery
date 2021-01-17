@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QQmlApplicationEngine>
+#include "bluetooth.h"
 
 class mainwindow : public QObject
 {
@@ -12,6 +13,8 @@ public:
 
     QQmlApplicationEngine *g_qmlEngine;
     QObject *g_rootObject;
+
+    Bluetooth * buletooth;
 
     Q_INVOKABLE void button_test();
 

@@ -54,6 +54,7 @@ import QtQuick.Controls 2.12
 import QtQuick.Controls.Material 2.12
 import QtQuick.Controls.Universal 2.12
 import Qt.labs.settings 1.0
+import QtQuick.Extras 1.4
 
 ApplicationWindow {
     id: window
@@ -63,6 +64,8 @@ ApplicationWindow {
     title: "Qt Quick Controls 2"
 
     property string scan_state : qsTr("点击按钮开始寻找设备")
+    property bool connect_status : false
+    property string led_color : "black"
 
     Settings {
         id: settings
@@ -112,7 +115,7 @@ ApplicationWindow {
 
             Label {
                 id: titleLabel
-                text: listView.currentItem ? listView.currentItem.text : "Gallery"
+                text: listView.currentItem ? listView.currentItem.text : "VOCO"
                 font.pixelSize: 20
                 elide: Label.ElideRight
                 horizontalAlignment: Qt.AlignHCenter
@@ -129,11 +132,11 @@ ApplicationWindow {
                     transformOrigin: Menu.TopRight
 
                     Action {
-                        text: "Settings"
+                        text: "设置"
                         onTriggered: settingsDialog.open()
                     }
                     Action {
-                        text: "About"
+                        text: "关于"
                         onTriggered: aboutDialog.open()
                     }
                 }
@@ -248,46 +251,23 @@ ApplicationWindow {
         initialItem: Pane {
             id: pane
 
-            Image {
-                id: logo
-                width: pane.availableWidth / 2
-                height: pane.availableHeight / 2
-                anchors.centerIn: parent
-                anchors.verticalCenterOffset: -50
-                fillMode: Image.PreserveAspectFit
-                source: "images/qt-logo.png"
-            }
 
-            Button
-            {
-                id: button1
-                text: "test"
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-                onClicked:
-                {
-                    mainwindow.button_test()
-                }
-            }
+            StatusIndicator {
+                id: connect_status_led
+                anchors.left : parent.left
+                anchors.leftMargin : 10
+                anchors.top : parent.top
+                anchors.topMargin : 10
+                color: window.led_color
+                active: true
 
+            }
             Label {
-                id: main_label
-                text: "Qt Quick Controls 2 provides a set of controls that can be used to build complete interfaces in Qt Quick."
-                anchors.margins: 20
-                anchors.top: logo.bottom
-                anchors.left: parent.left
-                anchors.right: parent.right
-                anchors.bottom: arrow.top
-                horizontalAlignment: Label.AlignHCenter
-                verticalAlignment: Label.AlignVCenter
-                wrapMode: Label.Wrap
-            }
-
-            Image {
-                id: arrow
-                source: "images/arrow.png"
-                anchors.left: parent.left
-                anchors.bottom: parent.bottom
+                anchors.left : connect_status_led.right
+                anchors.leftMargin : 20
+                anchors.verticalCenter: connect_status_led.verticalCenter
+                text: connect_status ? scan_state : qsTr("未连接设备")
+                font.pixelSize: 16
             }
         }
     }
@@ -351,7 +331,7 @@ ApplicationWindow {
         id: aboutDialog
         modal: true
         focus: true
-        title: "About"
+        title: qsTr("关于")
         x: (window.width - width) / 2
         y: window.height / 6
         width: Math.min(window.width, window.height) / 3 * 2
@@ -363,16 +343,14 @@ ApplicationWindow {
 
             Label {
                 width: aboutDialog.availableWidth
-                text: "The Qt Quick Controls 2 module delivers the next generation user interface controls based on Qt Quick."
+                text: qsTr("这个应用是用作连接VOCO设备，控制设备运行，监控设备运行状态。")
                 wrapMode: Label.Wrap
                 font.pixelSize: 12
             }
 
             Label {
                 width: aboutDialog.availableWidth
-                text: "In comparison to the desktop-oriented Qt Quick Controls 1, Qt Quick Controls 2 "
-                    + "are an order of magnitude simpler, lighter and faster, and are primarily targeted "
-                    + "towards embedded and mobile platforms."
+                text: "如在使用过程中有疑问，请发邮件至ｘｘｘ"
                 wrapMode: Label.Wrap
                 font.pixelSize: 12
             }

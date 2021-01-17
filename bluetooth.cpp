@@ -157,6 +157,8 @@ void Bluetooth::connect_device(const QString &address)
             connect(m_control, &QLowEnergyController::connected, this, [this]()
             {
                 qDebug("控制器连接.搜索服务……");
+                g_rootObject->setProperty("connect_status", true);
+                g_rootObject->setProperty("led_color", "green");
                 m_control->discoverServices();
                 g_rootObject->setProperty("scan_state", QString("已经连接到:").append(currentDeviceInfo.address().toString()));
             });
@@ -164,7 +166,9 @@ void Bluetooth::connect_device(const QString &address)
             connect(m_control, &QLowEnergyController::disconnected, this, [this]()
             {
                 qDebug("LowEnergy控制器断开连接");
-                g_rootObject->setProperty("scan_state", tr("连接继开，请点击按钮开始寻找设备并连接！"));
+                g_rootObject->setProperty("connect_status", false);
+                g_rootObject->setProperty("led_color", "black");
+                g_rootObject->setProperty("scan_state", tr("连接断开，请点击按钮开始寻找设备并连接！"));
             });
 
             // Connect

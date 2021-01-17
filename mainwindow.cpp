@@ -15,14 +15,15 @@ mainwindow::mainwindow(QObject *parent) : QObject(parent)
         QQuickStyle::setStyle(settings.value("style").toString());
 
     g_qmlEngine = new QQmlApplicationEngine(this);
+    g_qmlEngine->rootContext()->setContextProperty("availableStyles", QQuickStyle::availableStyles());
+    g_qmlEngine->rootContext()->setContextProperty("mainwindow", this);
     QQmlComponent lv_component(g_qmlEngine, QUrl(QStringLiteral("qrc:/main.qml")));
     g_rootObject = lv_component.create();
     g_rootObject->setParent(this);
 
-    Bluetooth * buletooth = new Bluetooth(g_rootObject);
-    g_qmlEngine->rootContext()->setContextProperty("mainwindow", this);
+    buletooth = new Bluetooth(g_rootObject);
     g_qmlEngine->rootContext()->setContextProperty("buletooth", buletooth);
-    g_qmlEngine->rootContext()->setContextProperty("availableStyles", QQuickStyle::availableStyles());
+
 }
 
 int index = 0;
