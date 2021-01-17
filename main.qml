@@ -206,7 +206,7 @@ ApplicationWindow {
                     }
 
                     model: ListModel {
-                        ListElement { title: "连接设备"; source: "qrc:/mypages/connect.qml" }
+                        ListElement {iconSource: "menu"; title: "连接设备"; source: "qrc:/mypages/connect.qml" }
 //                        ListElement { title: "BusyIndicator"; source: "qrc:/pages/BusyIndicatorPage.qml" }
 //                        ListElement { title: "Button"; source: "qrc:/pages/ButtonPage.qml" }
 //                        ListElement { title: "CheckBox"; source: "qrc:/pages/CheckBoxPage.qml" }
@@ -264,7 +264,10 @@ ApplicationWindow {
                 text: "test"
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
-                onClicked: mainwindow.button_test()
+                onClicked:
+                {
+                    mainwindow.button_test()
+                }
             }
 
             Label {

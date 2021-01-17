@@ -56,6 +56,63 @@ import QtQuick.Extras 1.4
 Page {
     id: connect_page
 
+    property int select_index
+
+    // 设备列表的样式
+    Rectangle
+    {
+        height: devices.height
+        width: devices.width
+        Component
+        {
+            id: contactDelegate
+            Item
+            {
+                id: box
+                height: 80
+                width: parent.width
+
+                MouseArea {
+                anchors.fill: parent
+                    onClicked: {
+                        console.log("onClicked = ", modelData.deviceAddress)
+                        buletooth.ble_stop_scan()
+                        select_index = index
+                        window.scan_state = qsTr("正在连接：") + modelData.deviceAddress + "..."
+                        buletooth.connect_device(modelData.deviceAddress)
+                    }
+                }
+
+                Column
+                {
+                    Text
+                    {
+                        id: device
+                        font.pixelSize: 16
+                        text: qsTr("设备名称：") + modelData.deviceName
+    //                            anchors.top: parent.top
+    //                            anchors.topMargin: parent.height * 0.05
+    //                            anchors.leftMargin: parent.width * 0.05
+    //                            anchors.left: parent.left
+                        color: "blue"
+                    }
+
+                    Text
+                    {
+                        id: deviceAddress
+                        font.pixelSize: 16
+                        text: qsTr("设备地址：") + modelData.deviceAddress
+    //                            anchors.bottom: parent.bottom
+    //                            anchors.bottomMargin: parent.height * 0.05
+    //                            anchors.rightMargin: parent.width * 0.05
+    //                            anchors.right: parent.right
+                        color: "blue"
+                    }
+                }
+            }
+        }
+    }
+
     Column {
         anchors.fill: parent
 
@@ -83,7 +140,7 @@ Page {
             id: rect2
             width: parent.width
             height: parent.height - (rect1.height + rect1.height)
-
+            
             ListView
             {
                 id: devices
@@ -96,45 +153,10 @@ Page {
                 highlight: Rectangle { color: "lightsteelblue"; radius: 5 }
                 clip: true
                 focus:true
+                currentIndex : connect_page.select_index
+//                onModelChanged: devices.currentIndex = connect_page.select_index
 
-                delegate: Item {
-                    id: box
-                    height: 80
-                    width: parent.width
-
-                    MouseArea {
-                    anchors.fill: parent
-                        onClicked: {
-                            console.log("onClicked")
-    //                        deviceFinder.connectToService(modelData.deviceAddress);
-    //                        app.showPage("Measure.qml")
-                        }
-                    }
-
-                    Column{
-                        Text {
-                            id: device
-                            font.pixelSize: 16
-                            text: qsTr("设备名称：") + modelData.deviceName
-//                            anchors.top: parent.top
-//                            anchors.topMargin: parent.height * 0.05
-//                            anchors.leftMargin: parent.width * 0.05
-//                            anchors.left: parent.left
-                            color: "blue"
-                        }
-
-                        Text {
-                            id: deviceAddress
-                            font.pixelSize: 16
-                            text: qsTr("设备地址：") + modelData.deviceAddress
-//                            anchors.bottom: parent.bottom
-//                            anchors.bottomMargin: parent.height * 0.05
-//                            anchors.rightMargin: parent.width * 0.05
-//                            anchors.right: parent.right
-                            color: "blue"
-                        }
-                    }
-                }
+                delegate: contactDelegate
             }
         }
 
@@ -149,7 +171,23 @@ Page {
                 text: "搜索设备"
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
-                onClicked: buletooth.ble_start_scan()
+                onClicked:
+                {
+                    connect_page.select_index = 0
+                    buletooth.ble_start_scan()
+                }
+            }
+
+            Button
+            {
+                id: button2
+                text: "test"
+                anchors.left : button1.right
+                anchors.verticalCenter: parent.verticalCenter
+                onClicked:
+                {
+                    console.log("select_index = ", connect_page.select_index)
+                }
             }
         }
     }
