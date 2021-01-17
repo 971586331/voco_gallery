@@ -7,6 +7,8 @@
 #include <QBluetoothDeviceDiscoveryAgent>
 #include <deviceinfo.h>
 #include <QLowEnergyController>
+#include <QtEndian>
+#include <QRandomGenerator>
 
 Bluetooth::Bluetooth(QObject *obj) : g_rootObject(obj)
 {
@@ -149,7 +151,7 @@ void Bluetooth::connect_device(const QString &address)
             {
                 Q_UNUSED(error);
                 qDebug("无法连接到远端设备。");
-                g_rootObject->setProperty("scan_state", qsTr("连接失败，请点击按钮开始寻找设备并连接！"));
+                g_rootObject->setProperty("scan_state", tr("连接失败，请点击按钮开始寻找设备并连接！"));
             });
 
             connect(m_control, &QLowEnergyController::connected, this, [this]()
@@ -162,7 +164,7 @@ void Bluetooth::connect_device(const QString &address)
             connect(m_control, &QLowEnergyController::disconnected, this, [this]()
             {
                 qDebug("LowEnergy控制器断开连接");
-                g_rootObject->setProperty("scan_state", qsTr("连接继开，请点击按钮开始寻找设备并连接！"));
+                g_rootObject->setProperty("scan_state", tr("连接继开，请点击按钮开始寻找设备并连接！"));
             });
 
             // Connect
@@ -185,6 +187,16 @@ void Bluetooth::slot_serviceDiscovered(const QBluetoothUuid &gatt)
     if (gatt == QBluetoothUuid(QBluetoothUuid::HeartRate))
     {
         qDebug("Heart Rate service discovered. Waiting for service scan to be done...");
+        m_hr_service = m_control->createServiceObject(QBluetoothUuid(QBluetoothUuid::HeartRate), this);
+
+        if (m_hr_service) {
+            connect(m_hr_service, &QLowEnergyService::stateChanged, this, &Bluetooth::slot_hr_serviceStateChanged);
+            connect(m_hr_service, &QLowEnergyService::characteristicChanged, this, &Bluetooth::slot_hr_updateHeartRateValue);
+//            connect(m_hr_service, &QLowEnergyService::descriptorWritten, this, &DeviceHandler::confirmedDescriptorWrite);
+            m_hr_service->discoverDetails();
+        } else {
+            qDebug("心率服务没有找到！");
+        }
     }
 }
 
@@ -194,5 +206,63 @@ void Bluetooth::slot_serviceDiscovered(const QBluetoothUuid &gatt)
 void Bluetooth::slot_discoveryFinished()
 {
     // 处理发现到的服务
+    qDebug("心率服务查找完成！");
+}
+
+/**
+ * @brief Bluetooth::serviceStateChanged    心率服务状态改变
+ * @param s
+ */
+void Bluetooth::slot_hr_serviceStateChanged(QLowEnergyService::ServiceState s)
+{
+    switch (s)
+    {
+        case QLowEnergyService::DiscoveringServices:
+            qDebug("Discovering services...");
+            break;
+        case QLowEnergyService::ServiceDiscovered:
+        {
+            qDebug("Service discovered.");
+
+            const QLowEnergyCharacteristic hrChar = m_hr_service->characteristic(QBluetoothUuid(QBluetoothUuid::HeartRateMeasurement));
+            if (!hrChar.isValid()) {
+                qDebug("HR Data not found.");
+                break;
+            }
+
+            m_hr_notificationDesc = hrChar.descriptor(QBluetoothUuid::ClientCharacteristicConfiguration);
+            if (m_hr_notificationDesc.isValid())
+                m_hr_service->writeDescriptor(m_hr_notificationDesc, QByteArray::fromHex("0100"));
+
+            break;
+        }
+        default : break;
+    }
+//    emit aliveChanged();
+}
+
+/**
+ * @brief Bluetooth::slot_hrupdateHeartRateValue 更新心率服务的值
+ * @param c
+ * @param value
+ */
+void Bluetooth::slot_hr_updateHeartRateValue(const QLowEnergyCharacteristic &c, const QByteArray &value)
+{
+    // ignore any other characteristic change -> shouldn't really happen though
+    if (c.uuid() != QBluetoothUuid(QBluetoothUuid::HeartRateMeasurement))
+        return;
+
+    auto data = reinterpret_cast<const quint8 *>(value.constData());
+    quint8 flags = *data;
+
+    //Heart Rate
+    int hrvalue = 0;
+    if (flags & 0x1) // HR 16 bit? otherwise 8 bit
+        hrvalue = static_cast<int>(qFromLittleEndian<quint16>(data[1]));
+    else
+        hrvalue = static_cast<int>(data[1]);
+
+    qDebug("心率 = %d", hrvalue);
+//    addMeasurement(hrvalue);
 }
 

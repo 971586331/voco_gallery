@@ -32,6 +32,8 @@ public:
 
     QObject *g_rootObject;
     QLowEnergyController *m_control = nullptr;
+    QLowEnergyService *m_hr_service = nullptr;
+    QLowEnergyDescriptor m_hr_notificationDesc;
 
     QBluetoothDeviceInfo currentDeviceInfo;
 
@@ -43,6 +45,8 @@ private slots:
     void slot_device_finished();
     void slot_serviceDiscovered(const QBluetoothUuid &gatt);
     void slot_discoveryFinished();
+    void slot_hr_serviceStateChanged(QLowEnergyService::ServiceState s);
+    void slot_hr_updateHeartRateValue(const QLowEnergyCharacteristic &c, const QByteArray &value);
 
 private:
     QBluetoothLocalDevice *m_localDevice;
