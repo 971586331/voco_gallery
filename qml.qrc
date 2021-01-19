@@ -55,5 +55,7 @@
         <file>pages/TumblerPage.qml</file>
         <file>images/user.png</file>
         <file>mypages/connect.qml</file>
+        <file>user_info.json</file>
+        <file>mypages/user_info.qml</file>
     </qresource>
 </RCC>

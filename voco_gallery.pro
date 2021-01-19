@@ -16,8 +16,10 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         bluetooth.cpp \
         deviceinfo.cpp \
+        jsonhandle.cpp \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+        user_info.cpp
 
 RESOURCES += qml.qrc
 
@@ -38,5 +40,9 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 HEADERS += \
     bluetooth.h \
     deviceinfo.h \
-    mainwindow.h
+    jsonhandle.h \
+    mainwindow.h \
+    user_info.h
+
+DISTFILES +=
 
