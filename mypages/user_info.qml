@@ -37,7 +37,7 @@ Page {
                     {
                         id: device
                         font.pixelSize: 16
-                        text: qsTr("用户名称：") + modelData.getName
+                        text: qsTr("用户名称：") + modelData.name
     //                            anchors.top: parent.top
     //                            anchors.topMargin: parent.height * 0.05
     //                            anchors.leftMargin: parent.width * 0.05
@@ -49,7 +49,7 @@ Page {
                     {
                         id: deviceAddress
                         font.pixelSize: 16
-                        text: qsTr("用户体重：") + modelData.getWeight
+                        text: qsTr("用户体重：") + modelData.weight
     //                            anchors.bottom: parent.bottom
     //                            anchors.bottomMargin: parent.height * 0.05
     //                            anchors.rightMargin: parent.width * 0.05
