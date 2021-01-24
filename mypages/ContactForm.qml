@@ -43,7 +43,7 @@ GridLayout {
     }
 
     Label {
-        text: qsTr("身高")
+        text: qsTr("身高(cm)")
         Layout.alignment: Qt.AlignLeft | Qt.AlignBaseline
     }
 
@@ -56,7 +56,7 @@ GridLayout {
     }
 
     Label {
-        text: qsTr("体重")
+        text: qsTr("体重(kg)")
         Layout.alignment: Qt.AlignLeft | Qt.AlignBaseline
     }
 

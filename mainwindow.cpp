@@ -59,6 +59,9 @@ QVariant mainwindow::get_user_info_list()
 
 bool mainwindow::add_user(QString name, int age, double height, double weight)
 {
+    if( name.isEmpty() )
+        return false;
+
     if( user_info_settings->contains(name) == true )
         return false;
 

@@ -28,7 +28,7 @@ Dialog {
     }
 
     x: parent.width / 2 - width / 2
-    y: parent.height / 2 - height / 2
+    y: parent.height / 10
 
     focus: true
     modal: true

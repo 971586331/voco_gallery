@@ -53,7 +53,7 @@ Page {
                     {
                         id: height
                         font.pixelSize: 16
-                        text: qsTr("身高：") + modelData.height
+                        text: qsTr("身高(cm)：") + modelData.height
                         anchors.left: name.left
                         anchors.leftMargin: 20
                         color: "blue"
@@ -62,7 +62,7 @@ Page {
                     {
                         id: weight
                         font.pixelSize: 16
-                        text: qsTr("体重：") + modelData.weight
+                        text: qsTr("体重(kg)：") + modelData.weight
                         anchors.left: name.left
                         anchors.leftMargin: 20
                         color: "blue"
