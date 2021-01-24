@@ -4,18 +4,17 @@
 #include <QSettings>
 #include <QQuickStyle>
 #include "bluetooth.h"
-#include "jsonhandle.h"
 #include "user_info.h"
 
 mainwindow::mainwindow(QObject *parent) : QObject(parent)
 {
     // 主题设置
-    QSettings settings;
+    sys_settings = new QSettings();
     QString style = QQuickStyle::name();
     if (!style.isEmpty())
-        settings.setValue("style", style);
+        sys_settings->setValue("style", style);
     else
-        QQuickStyle::setStyle(settings.value("style").toString());
+        QQuickStyle::setStyle(sys_settings->value("style").toString());
 
     g_qmlEngine = new QQmlApplicationEngine(this);
     g_qmlEngine->rootContext()->setContextProperty("availableStyles", QQuickStyle::availableStyles());
@@ -47,16 +46,43 @@ mainwindow::mainwindow(QObject *parent) : QObject(parent)
         struct user_info_t info = variant.value<struct user_info_t>();
         m_user_info.append(new user_info(info.name, info.age, info.height, info.weight));
     }
-
     emit userInfoChanged();
+
+    if( sys_settings->contains("current_user_name") == true )
+    {
+        int curent_index = sys_settings->value("current_user_name").toInt();
+        if( m_user_info.size() > curent_index )
+        {
+            active_user = (user_info *)m_user_info.at(curent_index);
+            if( active_user != nullptr )
+                g_rootObject->setProperty("current_user_name", active_user->name);
+
+        }
+    }
+    else
+    {
+        g_rootObject->setProperty("current_user_name", tr("未指定"));
+    }
 }
 
+/**
+ * @brief mainwindow::get_user_info_list
+ * @return
+ */
 QVariant mainwindow::get_user_info_list()
 {
     qDebug() << "run get_user_info_list";
     return QVariant::fromValue(m_user_info);
 }
 
+/**
+ * @brief mainwindow::add_user  添加用户
+ * @param name
+ * @param age
+ * @param height
+ * @param weight
+ * @return
+ */
 bool mainwindow::add_user(QString name, int age, double height, double weight)
 {
     if( name.isEmpty() )
@@ -73,7 +99,46 @@ bool mainwindow::add_user(QString name, int age, double height, double weight)
     return true;
 }
 
-int index = 0;
+/**
+ * @brief mainwindow::delete_uesr   删除用户
+ * @param index
+ */
+bool mainwindow::delete_user(int index)
+{
+    user_info *info = (user_info *)m_user_info.at(index);
+    if( info != nullptr )
+    {
+        qDebug() << "delete_uesr name = " << info->name;
+        if( info->name == active_user->name )
+        {
+            active_user = nullptr;
+            g_rootObject->setProperty("current_user_name", tr("未指定"));
+        }
+        user_info_settings->remove(info->name);
+        m_user_info.removeAt(index);
+        emit userInfoChanged();
+        return true;
+    }
+    return false;
+}
+
+/**
+ * @brief mainwindow::switch_user   切换用户
+ * @param index
+ * @return
+ */
+bool mainwindow::switch_user(int index)
+{
+    active_user = (user_info *)m_user_info.at(index);
+    if( active_user != nullptr )
+    {
+        g_rootObject->setProperty("current_user_name", active_user->name);
+        sys_settings->setValue("current_user_name", index);
+        return true;
+    }
+    return false;
+}
+
 void mainwindow::button_test()
 {
     qDebug("button_test()");

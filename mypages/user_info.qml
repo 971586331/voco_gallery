@@ -77,8 +77,27 @@ Page {
         onFinished:
         {
             var flag = mainwindow.add_user(name, age, height, weight)
-
+            if( flag === false )
+                msgdialog_warning.openMsg()
         }
+    }
+
+    MsgDialog {
+        id: msgdialog_warning
+        tipText : qsTr("添加失败，用户名称重复或用户名称为空！")
+        tipImage : "qrc:/images/warning.png"
+    }
+
+    MsgDialog {
+        id: msgdialog_ok
+        tipText : qsTr("用户切换成功！")
+        tipImage : "qrc:/images/ok.png"
+    }
+
+    MsgDialog {
+        id: msgdialog_ok_2
+        tipText : qsTr("用户已删除！")
+        tipImage : "qrc:/images/ok.png"
     }
 
     Column {
@@ -152,7 +171,9 @@ Page {
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked:
                 {
-                    mainwindow.button_test()
+                    var flag = mainwindow.delete_user(select_index)
+                    if( flag === true )
+                        msgdialog_ok_2.openMsg()
                 }
             }
 
@@ -165,7 +186,9 @@ Page {
                 anchors.verticalCenter: button_del_user.verticalCenter
                 onClicked:
                 {
-                    mainwindow.button_test()
+                    var flag = mainwindow.switch_user(select_index)
+                    if( flag === true )
+                        msgdialog_ok.openMsg()
                 }
             }
         }

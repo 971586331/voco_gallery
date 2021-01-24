@@ -66,6 +66,7 @@ ApplicationWindow {
     property string scan_state : qsTr("点击按钮开始寻找设备")
     property bool connect_status : false
     property string led_color : "black"
+    property string current_user_name : "未选择"
 
     Settings {
         id: settings
@@ -178,11 +179,18 @@ ApplicationWindow {
                 height: window.height / 10
                 Label
                 {
-                    width: drawer_rect2.width
+                    id:label_name_1
                     anchors.left: drawer_rect2.left
                     anchors.leftMargin: 10
                     anchors.top: drawer_rect2.top
-                    text: qsTr("用户名：xxx")
+                    text: qsTr("用户名：")
+                }
+                Label
+                {
+                    anchors.left: label_name_1.right
+                    anchors.leftMargin: 10
+                    anchors.verticalCenter: label_name_1.verticalCenter
+                    text: current_user_name
                 }
             }
 

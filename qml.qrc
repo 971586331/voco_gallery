@@ -59,5 +59,8 @@
         <file>mypages/user_info.qml</file>
         <file>mypages/ContactDialog.qml</file>
         <file>mypages/ContactForm.qml</file>
+        <file>mypages/MsgDialog.qml</file>
+        <file>images/warning.png</file>
+        <file>images/ok.png</file>
     </qresource>
 </RCC>
