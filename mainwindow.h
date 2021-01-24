@@ -5,6 +5,8 @@
 #include <QQmlApplicationEngine>
 #include "bluetooth.h"
 #include "jsonhandle.h"
+#include <QSettings>
+#include "user_info.h"
 
 class mainwindow : public QObject
 {
@@ -21,8 +23,10 @@ public:
     Bluetooth *buletooth;
     JsonHandle *user_info_obj;
 
-    QList<QObject*> m_user_info;
+    QSettings *user_info_settings;
+    QList<QObject *> m_user_info;
     QVariant get_user_info_list();
+    Q_INVOKABLE bool add_user(QString nmae, int age, double height, double weight);
 
     Q_INVOKABLE void button_test();
 

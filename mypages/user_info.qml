@@ -20,7 +20,7 @@ Page {
             Item
             {
                 id: box
-                height: 80
+                height: weight.y + weight.height - name.y + 10
                 width: parent.width
 
                 MouseArea {
@@ -35,29 +35,49 @@ Page {
                 {
                     Text
                     {
-                        id: device
+                        id: name
                         font.pixelSize: 16
-                        text: qsTr("用户名称：") + modelData.name
-    //                            anchors.top: parent.top
-    //                            anchors.topMargin: parent.height * 0.05
-    //                            anchors.leftMargin: parent.width * 0.05
-    //                            anchors.left: parent.left
+                        text: qsTr("姓名：") + modelData.name
                         color: "blue"
                     }
-
                     Text
                     {
-                        id: deviceAddress
+                        id: age
                         font.pixelSize: 16
-                        text: qsTr("用户体重：") + modelData.weight
-    //                            anchors.bottom: parent.bottom
-    //                            anchors.bottomMargin: parent.height * 0.05
-    //                            anchors.rightMargin: parent.width * 0.05
-    //                            anchors.right: parent.right
+                        text: qsTr("年龄：") + modelData.age
+                        anchors.left: name.left
+                        anchors.leftMargin: 20
+                        color: "blue"
+                    }
+                    Text
+                    {
+                        id: height
+                        font.pixelSize: 16
+                        text: qsTr("身高：") + modelData.height
+                        anchors.left: name.left
+                        anchors.leftMargin: 20
+                        color: "blue"
+                    }
+                    Text
+                    {
+                        id: weight
+                        font.pixelSize: 16
+                        text: qsTr("体重：") + modelData.weight
+                        anchors.left: name.left
+                        anchors.leftMargin: 20
                         color: "blue"
                     }
                 }
             }
+        }
+    }
+
+    ContactDialog {
+        id: contactDialog
+        onFinished:
+        {
+            var flag = mainwindow.add_user(name, age, height, weight)
+
         }
     }
 
@@ -75,10 +95,9 @@ Page {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment: Qt.AlignHCenter
-                text: scan_state
+                text: "用户列表"
                 onTextChanged:
                 {
-//                    console.log("text = ", text)
                 }
             }
         }
@@ -115,21 +134,35 @@ Page {
             height: parent.height / 10
             Button
             {
-                id: button1
-                text: "搜索设备"
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
+                id: button_add_user
+                text: "添加用户"
+                anchors.right: button_del_user.left
+                anchors.rightMargin: 20
+                anchors.verticalCenter: button_del_user.verticalCenter
                 onClicked:
                 {
+                    contactDialog.createContact()
                 }
             }
 
             Button
             {
-                id: button2
-                text: "test"
-                anchors.left : button1.right
-                anchors.verticalCenter: parent.verticalCenter
+                id: button_del_user
+                text: "删除用户"
+                anchors.horizontalCenter: parent.horizontalCenter
+                onClicked:
+                {
+                    mainwindow.button_test()
+                }
+            }
+
+            Button
+            {
+                id: button_switch_user
+                text: "切换用户"
+                anchors.left : button_del_user.right
+                anchors.leftMargin: 20
+                anchors.verticalCenter: button_del_user.verticalCenter
                 onClicked:
                 {
                     mainwindow.button_test()

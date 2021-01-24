@@ -57,5 +57,7 @@
         <file>mypages/connect.qml</file>
         <file>user_info.json</file>
         <file>mypages/user_info.qml</file>
+        <file>mypages/ContactDialog.qml</file>
+        <file>mypages/ContactForm.qml</file>
     </qresource>
 </RCC>
