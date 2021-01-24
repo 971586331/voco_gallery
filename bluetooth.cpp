@@ -9,6 +9,7 @@
 #include <QLowEnergyController>
 #include <QtEndian>
 #include <QRandomGenerator>
+#include <QString>
 
 Bluetooth::Bluetooth(QObject *obj) : g_rootObject(obj)
 {
@@ -134,51 +135,54 @@ void Bluetooth::connect_device(const QString &address)
         if( info->getAddress() == address )
         {
             currentDeviceInfo = info->getDevice();
-            // 找到这个设备的信息
-            // Make connections
-            //! [Connect-Signals-1]
-            m_control = QLowEnergyController::createCentral(currentDeviceInfo, this);
-            //! [Connect-Signals-1]
-            m_control->setRemoteAddressType(QLowEnergyController::PublicAddress);
-            //! [Connect-Signals-2]
-            connect(m_control, &QLowEnergyController::serviceDiscovered,
-                    this, &Bluetooth::slot_serviceDiscovered);
-            connect(m_control, &QLowEnergyController::discoveryFinished,
-                    this, &Bluetooth::slot_discoveryFinished);
-
-            connect(m_control, static_cast<void (QLowEnergyController::*)(QLowEnergyController::Error)>(&QLowEnergyController::error),
-                    this, [this](QLowEnergyController::Error error)
-            {
-                Q_UNUSED(error);
-                qDebug("无法连接到远端设备。");
-                g_rootObject->setProperty("scan_state", tr("连接失败，请点击按钮开始寻找设备并连接！"));
-            });
-
-            connect(m_control, &QLowEnergyController::connected, this, [this]()
-            {
-                qDebug("控制器连接.搜索服务……");
-                g_rootObject->setProperty("connect_status", true);
-                g_rootObject->setProperty("led_color", "green");
-                m_control->discoverServices();
-                g_rootObject->setProperty("scan_state", QString("已经连接到:").append(currentDeviceInfo.address().toString()));
-            });
-
-            connect(m_control, &QLowEnergyController::disconnected, this, [this]()
-            {
-                qDebug("LowEnergy控制器断开连接");
-                g_rootObject->setProperty("connect_status", false);
-                g_rootObject->setProperty("led_color", "black");
-                g_rootObject->setProperty("scan_state", tr("连接断开，请点击按钮开始寻找设备并连接！"));
-            });
-
-            // Connect
-            m_control->connectToDevice();
-
+            ble_connect_device(currentDeviceInfo);
             break;
         }
     }
 
     // 没有这个设备
+}
+
+void Bluetooth::ble_connect_device(QBluetoothDeviceInfo info)
+{
+    // Make connections
+    //! [Connect-Signals-1]
+    m_control = QLowEnergyController::createCentral(info, this);
+    //! [Connect-Signals-1]
+    m_control->setRemoteAddressType(QLowEnergyController::PublicAddress);
+    //! [Connect-Signals-2]
+    connect(m_control, &QLowEnergyController::serviceDiscovered,
+            this, &Bluetooth::slot_serviceDiscovered);
+    connect(m_control, &QLowEnergyController::discoveryFinished,
+            this, &Bluetooth::slot_discoveryFinished);
+
+    connect(m_control, static_cast<void (QLowEnergyController::*)(QLowEnergyController::Error)>(&QLowEnergyController::error),
+            this, [this](QLowEnergyController::Error error)
+    {
+        Q_UNUSED(error);
+        qDebug("无法连接到远端设备。");
+        g_rootObject->setProperty("scan_state", tr("连接失败，请点击按钮开始寻找设备并连接！"));
+    });
+
+    connect(m_control, &QLowEnergyController::connected, this, [this]()
+    {
+        qDebug("控制器连接.搜索服务……");
+        g_rootObject->setProperty("connect_status", true);
+        g_rootObject->setProperty("led_color", "green");
+        m_control->discoverServices();
+        g_rootObject->setProperty("scan_state", QString("已经连接到:").append(currentDeviceInfo.address().toString()));
+    });
+
+    connect(m_control, &QLowEnergyController::disconnected, this, [this]()
+    {
+        qDebug("LowEnergy控制器断开连接");
+        g_rootObject->setProperty("connect_status", false);
+        g_rootObject->setProperty("led_color", "black");
+        g_rootObject->setProperty("scan_state", tr("连接断开，请点击按钮开始寻找设备并连接！"));
+    });
+
+    // Connect
+    m_control->connectToDevice();
 }
 
 /**
@@ -187,19 +191,44 @@ void Bluetooth::connect_device(const QString &address)
  */
 void Bluetooth::slot_serviceDiscovered(const QBluetoothUuid &gatt)
 {
-    // 处理发现到的服务
-    if (gatt == QBluetoothUuid(QBluetoothUuid::HeartRate))
+    if( gatt.minimumSize() == 2 )
     {
-        qDebug("Heart Rate service discovered. Waiting for service scan to be done...");
-        m_hr_service = m_control->createServiceObject(QBluetoothUuid(QBluetoothUuid::HeartRate), this);
+        if (gatt == QBluetoothUuid(QBluetoothUuid::GenericAccess))
+        {
+            qDebug("服务：通用访问配置");
+        }
+        if (gatt == QBluetoothUuid(QBluetoothUuid::DeviceInformation))
+        {
+            qDebug("服务：设备信息");
+        }
+        if (gatt == QBluetoothUuid(QBluetoothUuid::HeartRate))
+        {
+            qDebug("服务：心率");
+            m_hr_service = m_control->createServiceObject(QBluetoothUuid(QBluetoothUuid::HeartRate), this);
 
-        if (m_hr_service) {
-            connect(m_hr_service, &QLowEnergyService::stateChanged, this, &Bluetooth::slot_hr_serviceStateChanged);
-            connect(m_hr_service, &QLowEnergyService::characteristicChanged, this, &Bluetooth::slot_hr_updateHeartRateValue);
-//            connect(m_hr_service, &QLowEnergyService::descriptorWritten, this, &DeviceHandler::confirmedDescriptorWrite);
-            m_hr_service->discoverDetails();
-        } else {
-            qDebug("心率服务没有找到！");
+            if (m_hr_service) {
+                connect(m_hr_service, &QLowEnergyService::stateChanged, this, &Bluetooth::slot_hr_serviceStateChanged);
+                connect(m_hr_service, &QLowEnergyService::characteristicChanged, this, &Bluetooth::slot_hr_updateHeartRateValue);
+    //            connect(m_hr_service, &QLowEnergyService::descriptorWritten, this, &DeviceHandler::confirmedDescriptorWrite);
+                m_hr_service->discoverDetails();
+            } else {
+                qDebug("心率服务没有找到！");
+            }
+        }
+    }
+    else if( gatt.minimumSize() == 16 )
+    {
+        if( gatt == QBluetoothUuid(QString("BBD71900-3F8A-4CCE-BD68-2C3827C286FF")) )
+        {
+            qDebug("服务：手环设备信息");
+        }
+        if( gatt == QBluetoothUuid(QString("2FED1A00-1FA6-4459-B24D-F0C6FC694414")) )
+        {
+            qDebug("服务：下发K50数据");
+        }
+        if( gatt == QBluetoothUuid(QString("F8011B00-F66E-494E-A672-A1E660829EAE")) )
+        {
+            qDebug("服务：获得K50数据");
         }
     }
 }

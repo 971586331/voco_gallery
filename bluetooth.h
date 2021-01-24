@@ -36,6 +36,7 @@ public:
     QLowEnergyDescriptor m_hr_notificationDesc;
 
     QBluetoothDeviceInfo currentDeviceInfo;
+    void ble_connect_device(QBluetoothDeviceInfo info);
 
 signals:
     void devicesChanged();
