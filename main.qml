@@ -278,6 +278,16 @@ ApplicationWindow {
                 text: connect_status ? scan_state : qsTr("未连接设备")
                 font.pixelSize: 16
             }
+            Button
+            {
+                text: "test"
+                anchors.top:  connect_status_led.bottom
+                anchors.topMargin: 20
+                onClicked:
+                {
+                    mainwindow.button_test()
+                }
+            }
         }
     }
 

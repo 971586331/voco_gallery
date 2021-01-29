@@ -139,8 +139,21 @@ bool mainwindow::switch_user(int index)
     return false;
 }
 
+
+QByteArray intToByte(int i)
+{
+    QByteArray abyte0;
+    abyte0.resize(4);
+    abyte0[0] = (uchar) (0x000000ff & i);
+    abyte0[1] = (uchar) ((0x0000ff00 & i) >> 8);
+    abyte0[2] = (uchar) ((0x00ff0000 & i) >> 16);
+    abyte0[3] = (uchar) ((0xff000000 & i) >> 24);
+    return abyte0;
+}
+int index = 9;
 void mainwindow::button_test()
 {
     qDebug("button_test()");
-
+    QByteArray ch = intToByte(index);
+    buletooth->m_service_1a00->writeCharacteristic(buletooth->Char_1a03, ch, QLowEnergyService::WriteWithResponse);
 }
