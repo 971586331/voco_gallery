@@ -20,8 +20,7 @@ Bluetooth::Bluetooth(QObject *obj) : g_rootObject(obj)
     connect(discoveryAgent,
                 SIGNAL(deviceDiscovered(QBluetoothDeviceInfo)),
                 this,
-                SLOT(addBlueToothDevicesToList(QBluetoothDeviceInfo))
-                );
+                SLOT(addBlueToothDevicesToList(QBluetoothDeviceInfo)));
     connect(discoveryAgent,SIGNAL(finished()),this,SLOT(slot_device_finished()));
 }
 
@@ -123,7 +122,7 @@ QVariant Bluetooth::get_devices_list()
 }
 
 /**
- * @brief Bluetooth::connect_device 连接到设备
+ * @brief Bluetooth::connect_device 连接到设备，供UI调用
  * @param address   设备Mac地址
  */
 void Bluetooth::connect_device(const QString &address)
@@ -144,6 +143,10 @@ void Bluetooth::connect_device(const QString &address)
     // 没有这个设备
 }
 
+/**
+ * @brief Bluetooth::ble_connect_device 连接设备
+ * @param info
+ */
 void Bluetooth::ble_connect_device(QBluetoothDeviceInfo info)
 {
     // Make connections
@@ -171,7 +174,7 @@ void Bluetooth::ble_connect_device(QBluetoothDeviceInfo info)
         g_rootObject->setProperty("connect_status", true);
         g_rootObject->setProperty("led_color", "green");
         m_control->discoverServices();
-        g_rootObject->setProperty("scan_state", QString("已经连接到:").append(currentDeviceInfo.address().toString()));
+        g_rootObject->setProperty("scan_state", QString("已经连接到:").append(currentDeviceInfo.name()));
     });
 
     connect(m_control, &QLowEnergyController::disconnected, this, [this]()
@@ -197,6 +200,15 @@ void Bluetooth::slot_serviceDiscovered(const QBluetoothUuid &gatt)
         if (gatt == QBluetoothUuid(QBluetoothUuid::GenericAccess))
         {
             qDebug("服务：通用访问配置");
+            m_service_1800 = m_control->createServiceObject(QBluetoothUuid(QBluetoothUuid::GenericAccess), this);
+
+            if (m_service_1800) {
+                connect(m_service_1800, &QLowEnergyService::stateChanged, this, &Bluetooth::slot_1800_serviceStateChanged);
+                connect(m_service_1800, &QLowEnergyService::characteristicRead, this, &Bluetooth::slot_1800_characteristicRead);
+                m_service_1800->discoverDetails();
+            } else {
+                qDebug("\"通用访问配置\"服务没有找到！");
+            }
         }
         if (gatt == QBluetoothUuid(QBluetoothUuid::DeviceInformation))
         {
@@ -219,14 +231,23 @@ void Bluetooth::slot_serviceDiscovered(const QBluetoothUuid &gatt)
     }
     else if( gatt.minimumSize() == 16 )
     {
-        if( gatt == QBluetoothUuid(QString("BBD71900-3F8A-4CCE-BD68-2C3827C286FF")) )
+        if( gatt == QBluetoothUuid(QString(UUID_1900)) )
         {
             qDebug("服务：手环设备信息");
+            m_service_1900 = m_control->createServiceObject(QBluetoothUuid(QString(UUID_1900)), this);
+            if (m_service_1900) {
+                connect(m_service_1900, &QLowEnergyService::stateChanged, this, &Bluetooth::slot_1900_serviceStateChanged);
+                connect(m_service_1900, &QLowEnergyService::characteristicRead, this, &Bluetooth::slot_1900_characteristicRead);
+                m_service_1900->discoverDetails();
+            } else {
+                qDebug("1A00服务没有找到！");
+            }
+
         }
-        if( gatt == QBluetoothUuid(QString("2FED1A00-1FA6-4459-B24D-F0C6FC694414")) )
+        if( gatt == QBluetoothUuid(QString(UUID_1A00)) )
         {
             qDebug("服务：下发K50数据");
-            m_service_1a00 = m_control->createServiceObject(QBluetoothUuid(QString("2FED1A00-1FA6-4459-B24D-F0C6FC694414")), this);
+            m_service_1a00 = m_control->createServiceObject(QBluetoothUuid(QString(UUID_1A00)), this);
             if (m_service_1a00) {
                 connect(m_service_1a00, &QLowEnergyService::stateChanged, this, &Bluetooth::slot_1a00_serviceStateChanged);
                 m_service_1a00->discoverDetails();
@@ -234,10 +255,10 @@ void Bluetooth::slot_serviceDiscovered(const QBluetoothUuid &gatt)
                 qDebug("1A00服务没有找到！");
             }
         }
-        if( gatt == QBluetoothUuid(QString("F8011B00-F66E-494E-A672-A1E660829EAE")) )
+        if( gatt == QBluetoothUuid(QString(UUID_1B00)) )
         {
             qDebug("服务：获得K50数据");
-            m_service_1b00 = m_control->createServiceObject(QBluetoothUuid(QString("F8011B00-F66E-494E-A672-A1E660829EAE")), this);
+            m_service_1b00 = m_control->createServiceObject(QBluetoothUuid(QString(UUID_1B00)), this);
             if (m_service_1b00) {
                 connect(m_service_1b00, &QLowEnergyService::stateChanged, this, &Bluetooth::slot_1b00_serviceStateChanged);
                 connect(m_service_1b00, &QLowEnergyService::characteristicChanged, this, &Bluetooth::slot_1b00_updateValue);
@@ -314,7 +335,74 @@ void Bluetooth::slot_hr_updateHeartRateValue(const QLowEnergyCharacteristic &c, 
 }
 
 /**
- * @brief Bluetooth::slot_1a00_serviceStateChanged
+ * @brief Bluetooth::slot_1900_serviceStateChanged  手环设备信息
+ * @param s
+ */
+void Bluetooth::slot_1900_serviceStateChanged(QLowEnergyService::ServiceState s)
+{
+    switch (s)
+    {
+        case QLowEnergyService::DiscoveringServices:
+            qDebug("1900 Discovering services...");
+            break;
+        case QLowEnergyService::ServiceDiscovered:
+        {
+            qDebug("1900 Service discovered.");
+
+            Char_1901 = m_service_1900->characteristic(QBluetoothUuid(QString(UUID_1901)));
+            if (!Char_1a01.isValid())
+            {
+                qDebug("(error)0x1901 not found.");
+            }
+            Char_1902 = m_service_1900->characteristic(QBluetoothUuid(QString(UUID_1902)));
+            if (!Char_1902.isValid())
+            {
+                qDebug("(error)0x1902 not found.");
+            }
+            Char_1903 = m_service_1900->characteristic(QBluetoothUuid(QString(UUID_1903)));
+            if (!Char_1903.isValid())
+            {
+                qDebug("(error)0x1903 not found.");
+            }
+            Char_1908 = m_service_1900->characteristic(QBluetoothUuid(QString(UUID_1908)));
+            if (!Char_1908.isValid())
+            {
+                qDebug("(error)0x1908 not found.");
+            }
+
+            break;
+        }
+        default : break;
+    }
+}
+
+/**
+ * @brief Bluetooth::slot_1900_characteristicRead 手环设备信息
+ * @param characteristic
+ * @param value
+ */
+void Bluetooth::slot_1900_characteristicRead(const QLowEnergyCharacteristic &characteristic, const QByteArray &value)
+{
+    if(characteristic.uuid() == QBluetoothUuid(QBluetoothUuid(QString(UUID_1901))))
+    {
+        qDebug() << "手环生产厂商 = " << value;
+    }
+    if(characteristic.uuid() == QBluetoothUuid(QBluetoothUuid(QString(UUID_1902))))
+    {
+        qDebug() << "手环产品型号 = " << value;
+    }
+    if(characteristic.uuid() == QBluetoothUuid(QBluetoothUuid(QString(UUID_1903))))
+    {
+        qDebug() << "手环产品序列号 = " << value;
+    }
+    if(characteristic.uuid() == QBluetoothUuid(QBluetoothUuid(QString(UUID_1908))))
+    {
+        qDebug() << "Flash中保存的手环地址 = " << value;
+    }
+}
+
+/**
+ * @brief Bluetooth::slot_1a00_serviceStateChanged 下发K50数据
  * @param s
  */
 void Bluetooth::slot_1a00_serviceStateChanged(QLowEnergyService::ServiceState s)
@@ -328,42 +416,42 @@ void Bluetooth::slot_1a00_serviceStateChanged(QLowEnergyService::ServiceState s)
         {
             qDebug("1a00 Service discovered.");
 
-            Char_1a01 = m_service_1a00->characteristic(QBluetoothUuid(QString("2FED1A01-1FA6-4459-B24D-F0C6FC694414")));
+            Char_1a01 = m_service_1a00->characteristic(QBluetoothUuid(QString(UUID_1A01)));
             if (!Char_1a01.isValid())
             {
                 qDebug("(error)0x1a01 not found.");
             }
-            Char_1a02 = m_service_1a00->characteristic(QBluetoothUuid(QString("2FED1A02-1FA6-4459-B24D-F0C6FC694414")));
+            Char_1a02 = m_service_1a00->characteristic(QBluetoothUuid(QString(UUID_1A02)));
             if (!Char_1a02.isValid())
             {
                 qDebug("(error)0x1a02 not found.");
             }
-            Char_1a03 = m_service_1a00->characteristic(QBluetoothUuid(QString("2FED1A03-1FA6-4459-B24D-F0C6FC694414")));
+            Char_1a03 = m_service_1a00->characteristic(QBluetoothUuid(QString(UUID_1A03)));
             if (!Char_1a03.isValid())
             {
                 qDebug("(error)0x1a03 not found.");
             }
-            Char_1a04 = m_service_1a00->characteristic(QBluetoothUuid(QString("2FED1A04-1FA6-4459-B24D-F0C6FC694414")));
+            Char_1a04 = m_service_1a00->characteristic(QBluetoothUuid(QString(UUID_1A04)));
             if (!Char_1a04.isValid())
             {
                 qDebug("(error)0x1a04 not found.");
             }
-            Char_1a05 = m_service_1a00->characteristic(QBluetoothUuid(QString("2FED1A05-1FA6-4459-B24D-F0C6FC694414")));
+            Char_1a05 = m_service_1a00->characteristic(QBluetoothUuid(QString(UUID_1A05)));
             if (!Char_1a05.isValid())
             {
                 qDebug("(error)0x1a05 not found.");
             }
-            Char_1a06 = m_service_1a00->characteristic(QBluetoothUuid(QString("2FED1A06-1FA6-4459-B24D-F0C6FC694414")));
+            Char_1a06 = m_service_1a00->characteristic(QBluetoothUuid(QString(UUID_1A06)));
             if (!Char_1a06.isValid())
             {
                 qDebug("(error)0x1a06 not found.");
             }
-            Char_1a07 = m_service_1a00->characteristic(QBluetoothUuid(QString("2FED1A07-1FA6-4459-B24D-F0C6FC694414")));
+            Char_1a07 = m_service_1a00->characteristic(QBluetoothUuid(QString(UUID_1A07)));
             if (!Char_1a07.isValid())
             {
                 qDebug("(error)0x1a07 not found.");
             }
-            Char_1a08 = m_service_1a00->characteristic(QBluetoothUuid(QString("2FED1A08-1FA6-4459-B24D-F0C6FC694414")));
+            Char_1a08 = m_service_1a00->characteristic(QBluetoothUuid(QString(UUID_1A08)));
             if (!Char_1a08.isValid())
             {
                 qDebug("(error)0x1a08 not found.");
@@ -376,7 +464,7 @@ void Bluetooth::slot_1a00_serviceStateChanged(QLowEnergyService::ServiceState s)
 }
 
 /**
- * @brief Bluetooth::slot_1b00_serviceStateChanged
+ * @brief Bluetooth::slot_1b00_serviceStateChanged 获得k50数据
  * @param s
  */
 void Bluetooth::slot_1b00_serviceStateChanged(QLowEnergyService::ServiceState s)
@@ -390,7 +478,7 @@ void Bluetooth::slot_1b00_serviceStateChanged(QLowEnergyService::ServiceState s)
         {
             qDebug("1b00 Service discovered.");
 
-            QLowEnergyCharacteristic Char_1b01 = m_service_1b00->characteristic(QBluetoothUuid(QString("F8011B01-F66E-494E-A672-A1E660829EAE")));
+            QLowEnergyCharacteristic Char_1b01 = m_service_1b00->characteristic(QBluetoothUuid(QString(UUID_1B01)));
             if (!Char_1b01.isValid()) {
                 qDebug("1b01 not found.");
                 break;
@@ -399,7 +487,7 @@ void Bluetooth::slot_1b00_serviceStateChanged(QLowEnergyService::ServiceState s)
             if (m_1b01_notificationDesc.isValid())
                 m_service_1b00->writeDescriptor(m_1b01_notificationDesc, QByteArray::fromHex("0100"));
 
-            QLowEnergyCharacteristic Char_1b02 = m_service_1b00->characteristic(QBluetoothUuid(QString("F8011B02-F66E-494E-A672-A1E660829EAE")));
+            QLowEnergyCharacteristic Char_1b02 = m_service_1b00->characteristic(QBluetoothUuid(QString(UUID_1B02)));
             if (!Char_1b02.isValid()) {
                 qDebug("1b02 Data not found.");
                 break;
@@ -408,7 +496,7 @@ void Bluetooth::slot_1b00_serviceStateChanged(QLowEnergyService::ServiceState s)
             if (m_1b02_notificationDesc.isValid())
                 m_service_1b00->writeDescriptor(m_1b02_notificationDesc, QByteArray::fromHex("0100"));
 
-            QLowEnergyCharacteristic Char_1b03 = m_service_1b00->characteristic(QBluetoothUuid(QString("F8011B03-F66E-494E-A672-A1E660829EAE")));
+            QLowEnergyCharacteristic Char_1b03 = m_service_1b00->characteristic(QBluetoothUuid(QString(UUID_1B03)));
             if (!Char_1b03.isValid()) {
                 qDebug("1b03 not found.");
                 break;
@@ -424,14 +512,14 @@ void Bluetooth::slot_1b00_serviceStateChanged(QLowEnergyService::ServiceState s)
 }
 
 /**
- * @brief Bluetooth::slot_1b00_updateValue
+ * @brief Bluetooth::slot_1b00_updateValue 获得k50数据
  * @param c
  * @param value
  */
 void Bluetooth::slot_1b00_updateValue(const QLowEnergyCharacteristic &c, const QByteArray &value)
 {
     // K50 状态
-    if (c.uuid() == QBluetoothUuid(QString("F8011B01-F66E-494E-A672-A1E660829EAE")))
+    if (c.uuid() == QBluetoothUuid(QString(UUID_1B01)))
     {
         if( value.length() != 2 )
         {
@@ -446,7 +534,7 @@ void Bluetooth::slot_1b00_updateValue(const QLowEnergyCharacteristic &c, const Q
     }
 
     // 预热剩余时间
-    if (c.uuid() == QBluetoothUuid(QString("F8011B02-F66E-494E-A672-A1E660829EAE")))
+    if (c.uuid() == QBluetoothUuid(QString(UUID_1B02)))
     {
         if( value.length() != 2 )
         {
@@ -460,7 +548,7 @@ void Bluetooth::slot_1b00_updateValue(const QLowEnergyCharacteristic &c, const Q
     }
 
     // 呼吸数据包
-    if (c.uuid() == QBluetoothUuid(QString("F8011B03-F66E-494E-A672-A1E660829EAE")))
+    if (c.uuid() == QBluetoothUuid(QString(UUID_1B03)))
     {
         if( value.length() != 56 )
         {
@@ -474,4 +562,45 @@ void Bluetooth::slot_1b00_updateValue(const QLowEnergyCharacteristic &c, const Q
             qDebug("%d ", data[i]);
     }
 
+}
+
+/**
+ * @brief Bluetooth::slot_1800_serviceStateChanged 通用访问配置
+ * @param s
+ */
+void Bluetooth::slot_1800_serviceStateChanged(QLowEnergyService::ServiceState s)
+{
+    switch (s)
+    {
+        case QLowEnergyService::DiscoveringServices:
+            qDebug("1b00 Discovering services...");
+            break;
+        case QLowEnergyService::ServiceDiscovered:
+        {
+            qDebug("1b00 Service discovered.");
+
+            QLowEnergyCharacteristic Char_2a00 = m_service_1800->characteristic(QBluetoothUuid::DeviceName);
+            if (!Char_2a00.isValid()) {
+                qDebug("2a00 not found.");
+                break;
+            }
+            m_service_1800->readCharacteristic(Char_2a00);
+
+            break;
+        }
+        default : break;
+    }
+}
+
+/**
+ * @brief Bluetooth::slot_1800_characteristicRead 通用访问配置
+ * @param characteristic
+ * @param value
+ */
+void Bluetooth::slot_1800_characteristicRead(const QLowEnergyCharacteristic &characteristic, const QByteArray &value)
+{
+    if(characteristic.uuid() == QBluetoothUuid(QBluetoothUuid::DeviceName))
+    {
+        qDebug() << "DeviceName = " << value;
+    }
 }

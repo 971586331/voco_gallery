@@ -128,18 +128,6 @@ Page {
                     buletooth.ble_start_scan()
                 }
             }
-
-            Button
-            {
-                id: button2
-                text: "test"
-                anchors.left : button1.right
-                anchors.verticalCenter: parent.verticalCenter
-                onClicked:
-                {
-                    console.log("select_index = ", connect_page.select_index)
-                }
-            }
         }
     }
 }
