@@ -150,10 +150,31 @@ QByteArray intToByte(int i)
     abyte0[3] = (uchar) ((0xff000000 & i) >> 24);
     return abyte0;
 }
+
 int index = 9;
 void mainwindow::button_test()
 {
     qDebug("button_test()");
     QByteArray ch = intToByte(index);
     buletooth->m_service_1a00->writeCharacteristic(buletooth->Char_1a03, ch, QLowEnergyService::WriteWithResponse);
+}
+
+void mainwindow::set_wristband_addr(QString addr)
+{
+    qDebug() << "设置手环地址：" << addr;
+    QByteArray abyte;
+    QString zero("0");
+    abyte.append(zero.toInt(nullptr, 16));
+    QStringList list = addr.split(":");
+    if( list.size() == 6 )
+    {
+        for (int i = list.size()-1; i >=0; i--)
+        {
+            QString current = list.at(i);
+            qDebug() << "addr:" << current.toInt(nullptr, 16);
+            abyte.append(current.toInt(nullptr, 16));
+        }
+        qDebug() << "abyte size:" << abyte.length();
+        buletooth->m_service_1a00->writeCharacteristic(buletooth->Char_1a01, abyte, QLowEnergyService::WriteWithResponse);
+    }
 }

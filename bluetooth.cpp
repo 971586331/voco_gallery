@@ -171,18 +171,18 @@ void Bluetooth::ble_connect_device(QBluetoothDeviceInfo info)
     connect(m_control, &QLowEnergyController::connected, this, [this]()
     {
         qDebug("控制器连接.搜索服务……");
-        g_rootObject->setProperty("connect_status", true);
+        g_rootObject->setProperty("scan_state", QString("已经连接到:").append(currentDeviceInfo.name()));
+        g_rootObject->setProperty("connect_status", QString("已经连接到:").append(currentDeviceInfo.name()));
         g_rootObject->setProperty("led_color", "green");
         m_control->discoverServices();
-        g_rootObject->setProperty("scan_state", QString("已经连接到:").append(currentDeviceInfo.name()));
     });
 
     connect(m_control, &QLowEnergyController::disconnected, this, [this]()
     {
         qDebug("LowEnergy控制器断开连接");
-        g_rootObject->setProperty("connect_status", false);
-        g_rootObject->setProperty("led_color", "black");
         g_rootObject->setProperty("scan_state", tr("连接断开，请点击按钮开始寻找设备并连接！"));
+        g_rootObject->setProperty("connect_status", tr("未连接设备"));
+        g_rootObject->setProperty("led_color", "black");
     });
 
     // Connect
@@ -369,6 +369,7 @@ void Bluetooth::slot_1900_serviceStateChanged(QLowEnergyService::ServiceState s)
             {
                 qDebug("(error)0x1908 not found.");
             }
+            m_service_1900->readCharacteristic(Char_1908);
 
             break;
         }
@@ -397,7 +398,16 @@ void Bluetooth::slot_1900_characteristicRead(const QLowEnergyCharacteristic &cha
     }
     if(characteristic.uuid() == QBluetoothUuid(QBluetoothUuid(QString(UUID_1908))))
     {
-        qDebug() << "Flash中保存的手环地址 = " << value;
+        if( value.length() == 7 )
+        {
+            const char *ch;
+            ch = value.data();
+            QString str1 = QString("%1:%2:%3:%4:%5:%6").arg(ch[6],2,16,QLatin1Char('0')).arg(ch[5],2,16,QLatin1Char('0')) \
+                    .arg(ch[4],2,16,QLatin1Char('0')).arg(ch[3],2,16,QLatin1Char('0')).arg(ch[2],2,16,QLatin1Char('0')) \
+                    .arg(ch[1],2,16,QLatin1Char('0'));
+            qDebug() << "Flash中保存的手环地址 = " << str1.toUpper();
+            g_rootObject->setProperty("current_wristband_addr", str1.toUpper());
+        }
     }
 }
 
@@ -579,7 +589,7 @@ void Bluetooth::slot_1800_serviceStateChanged(QLowEnergyService::ServiceState s)
         {
             qDebug("1b00 Service discovered.");
 
-            QLowEnergyCharacteristic Char_2a00 = m_service_1800->characteristic(QBluetoothUuid::DeviceName);
+            Char_2a00 = m_service_1800->characteristic(QBluetoothUuid::DeviceName);
             if (!Char_2a00.isValid()) {
                 qDebug("2a00 not found.");
                 break;

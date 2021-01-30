@@ -64,9 +64,10 @@ ApplicationWindow {
     title: "Qt Quick Controls 2"
 
     property string scan_state : qsTr("点击按钮开始寻找设备")
-    property bool connect_status : false
+    property string connect_status : qsTr("未连接到设备")
     property string led_color : "black"
     property string current_user_name : "未选择"
+    property string current_wristband_addr : ""
 
     Settings {
         id: settings
@@ -219,6 +220,7 @@ ApplicationWindow {
                     model: ListModel {
                         ListElement {title: "用户管理"; source: "qrc:/mypages/user_info.qml" }
                         ListElement {title: "连接设备"; source: "qrc:/mypages/connect.qml" }
+                        ListElement {title: "设置心率手环"; source: "qrc:/mypages/wristband.qml" }
 //                        ListElement { title: "BusyIndicator"; source: "qrc:/pages/BusyIndicatorPage.qml" }
 //                        ListElement { title: "Button"; source: "qrc:/pages/ButtonPage.qml" }
 //                        ListElement { title: "CheckBox"; source: "qrc:/pages/CheckBoxPage.qml" }
@@ -275,7 +277,7 @@ ApplicationWindow {
                 anchors.left : connect_status_led.right
                 anchors.leftMargin : 20
                 anchors.verticalCenter: connect_status_led.verticalCenter
-                text: connect_status ? scan_state : qsTr("未连接设备")
+                text: connect_status
                 font.pixelSize: 16
             }
             Button

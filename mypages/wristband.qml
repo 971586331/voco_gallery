@@ -8,6 +8,28 @@ Page {
     id: connect_page
 
     property int select_index
+    property string select_wristband_addr : ""
+
+    Dialog {
+        id: dialog
+
+        x: parent.width / 2 - width / 2
+        y: parent.height / 10
+
+        focus: true
+        modal: true
+        title: qsTr("添加用户")
+        Text {
+            text: qsTr("是否要将连接的手环设置为：\n") + select_wristband_addr
+        }
+        standardButtons: Dialog.Ok | Dialog.Cancel
+
+        onAccepted:
+        {
+            window.current_wristband_addr = select_wristband_addr
+            mainwindow.set_wristband_addr(select_wristband_addr);
+        }
+    }
 
     // 设备列表的样式
     Rectangle
@@ -26,11 +48,10 @@ Page {
                 MouseArea {
                 anchors.fill: parent
                     onClicked: {
-                        console.log("onClicked = ", modelData.deviceAddress)
                         buletooth.ble_stop_scan()
                         select_index = index
-                        window.scan_state = qsTr("正在连接：") + modelData.deviceAddress + "..."
-                        buletooth.connect_device(modelData.deviceAddress)
+                        select_wristband_addr = modelData.deviceAddress
+                        dialog.open();
                     }
                 }
 
@@ -70,10 +91,9 @@ Page {
                 anchors.horizontalCenter: parent.horizontalCenter
                 anchors.verticalCenter: parent.verticalCenter
                 horizontalAlignment: Qt.AlignHCenter
-                text: scan_state
+                text: "当前设置：" + window.current_wristband_addr
                 onTextChanged:
                 {
-//                    console.log("text = ", text)
                 }
             }
         }
@@ -97,7 +117,6 @@ Page {
                 clip: true
                 focus:true
                 currentIndex : connect_page.select_index
-//                onModelChanged: devices.currentIndex = connect_page.select_index
 
                 delegate: contactDelegate
             }

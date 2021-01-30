@@ -62,5 +62,6 @@
         <file>mypages/MsgDialog.qml</file>
         <file>images/warning.png</file>
         <file>images/ok.png</file>
+        <file>mypages/wristband.qml</file>
     </qresource>
 </RCC>

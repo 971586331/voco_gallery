@@ -31,6 +31,7 @@ public:
     Q_INVOKABLE bool add_user(QString nmae, int age, double height, double weight);
     Q_INVOKABLE bool delete_user(int index);
     Q_INVOKABLE bool switch_user(int index);
+    Q_INVOKABLE void set_wristband_addr(QString addr);
 
     Q_INVOKABLE void button_test();
 
