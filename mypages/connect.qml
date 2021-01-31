@@ -4,6 +4,8 @@ import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.12
 import QtQuick.Extras 1.4
 
+// 连接设备页面
+
 Page {
     id: connect_page
 

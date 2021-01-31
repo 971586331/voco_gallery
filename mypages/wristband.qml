@@ -4,8 +4,10 @@ import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.12
 import QtQuick.Extras 1.4
 
+// 设置用户手环页面
+
 Page {
-    id: connect_page
+    id: wristband_page
 
     property int select_index
     property string select_wristband_addr : ""

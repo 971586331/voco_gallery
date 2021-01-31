@@ -63,5 +63,6 @@
         <file>images/warning.png</file>
         <file>images/ok.png</file>
         <file>mypages/wristband.qml</file>
+        <file>mypages/calibration.qml</file>
     </qresource>
 </RCC>

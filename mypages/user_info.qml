@@ -4,6 +4,8 @@ import QtQuick.Layouts 1.12
 import QtQuick.Controls 2.12
 import QtQuick.Extras 1.4
 
+// 用户信息页面
+
 Page {
     id: user_info_page
 

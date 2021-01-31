@@ -221,6 +221,7 @@ ApplicationWindow {
                         ListElement {title: "用户管理"; source: "qrc:/mypages/user_info.qml" }
                         ListElement {title: "连接设备"; source: "qrc:/mypages/connect.qml" }
                         ListElement {title: "设置心率手环"; source: "qrc:/mypages/wristband.qml" }
+                        ListElement {title: "校准"; source: "qrc:/mypages/calibration.qml" }
 //                        ListElement { title: "BusyIndicator"; source: "qrc:/pages/BusyIndicatorPage.qml" }
 //                        ListElement { title: "Button"; source: "qrc:/pages/ButtonPage.qml" }
 //                        ListElement { title: "CheckBox"; source: "qrc:/pages/CheckBoxPage.qml" }
