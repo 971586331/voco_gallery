@@ -9,81 +9,88 @@ import QtQuick.Extras 1.4
 Page {
     id: calibration_page
 
-    Column {
-        anchors.fill: parent
+    GridLayout
+    {
+        columns: 4
 
-        Rectangle
-        {
-            id: rect1
-            width: parent.width
-            height: parent.height / 10
-            Label
-            {
-                id: label1
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-                horizontalAlignment: Qt.AlignHCenter
-                text: "用户列表"
-                onTextChanged:
-                {
-                }
-            }
+        Label {
+            text: qsTr("O2 Span cal：")
         }
 
-        Rectangle
-        {
-            id: rect2
-            width: parent.width
-            height: parent.height - (rect1.height + rect1.height)
-
-
+        Label {
+            id : lable1
+            text: calibration_lable1
         }
 
-        Rectangle
+        BusyIndicator
         {
-            id: rect3
-            width: parent.width
-            height: parent.height / 10
-            Button
-            {
-                id: button_add_user
-                text: "添加用户"
-                anchors.right: button_del_user.left
-                anchors.rightMargin: 20
-                anchors.verticalCenter: button_del_user.verticalCenter
-                onClicked:
-                {
-                    contactDialog.createContact()
-                }
-            }
+            id : busy1
+            running: calibration_busy1
+        }
 
-            Button
-            {
-                id: button_del_user
-                text: "删除用户"
-                anchors.horizontalCenter: parent.horizontalCenter
-                onClicked:
-                {
-                    var flag = mainwindow.delete_user(select_index)
-                    if( flag === true )
-                        msgdialog_ok_2.openMsg()
-                }
-            }
+        Button {
+            text: qsTr("校准")
+            onClicked: buletooth.calibration_1_callback()
+        }
 
-            Button
-            {
-                id: button_switch_user
-                text: "切换用户"
-                anchors.left : button_del_user.right
-                anchors.leftMargin: 20
-                anchors.verticalCenter: button_del_user.verticalCenter
-                onClicked:
-                {
-                    var flag = mainwindow.switch_user(select_index)
-                    if( flag === true )
-                        msgdialog_ok.openMsg()
-                }
-            }
+        Label {
+            text: qsTr("Flow Zero cal：")
+        }
+
+        Label {
+            id : lable2
+            text: calibration_lable2
+        }
+
+        BusyIndicator
+        {
+            id : busy2
+            running: calibration_busy2
+        }
+
+        Button {
+            text: qsTr("校准")
+            onClicked: buletooth.calibration_2_callback()
+        }
+
+        Label {
+            text: qsTr("OC2 Zero cal：")
+        }
+
+        Label {
+            id : lable3
+            text: calibration_lable3
+        }
+
+        BusyIndicator
+        {
+            id : busy3
+            running: calibration_busy3
+        }
+
+        Button {
+            text: qsTr("校准")
+            onClicked: buletooth.calibration_3_callback()
+        }
+
+        Label {
+            text: qsTr("CO2 Span cal：")
+        }
+
+        Label {
+            id : lable4
+            text: calibration_lable4
+        }
+
+        BusyIndicator
+        {
+            id : busy4
+            running: calibration_busy4
+        }
+
+        Button {
+            text: qsTr("校准")
+            onClicked: buletooth.calibration_4_callback()
         }
     }
 }
