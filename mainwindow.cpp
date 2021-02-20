@@ -106,7 +106,7 @@ bool mainwindow::add_user(QString name, int age, double height, double weight)
 bool mainwindow::delete_user(int index)
 {
 //    qDebug() << "delete_uesr index = " << index;
-    if( index <= 0 )
+    if( m_user_info.empty() )
         return false;
 
     user_info *info = (user_info *)m_user_info.at(index);
@@ -133,7 +133,7 @@ bool mainwindow::delete_user(int index)
  */
 bool mainwindow::switch_user(int index)
 {
-    if( index <= 0 )
+    if( m_user_info.empty() )
         return false;
 
     active_user = (user_info *)m_user_info.at(index);
