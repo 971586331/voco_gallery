@@ -537,10 +537,11 @@ void Bluetooth::slot_1b00_updateValue(const QLowEnergyCharacteristic &c, const Q
             return;
         }
         auto data = reinterpret_cast<const quint8 *>(value.constData());
-        quint8 flags1 = *data;
-        quint8 flags2 = *(data+1);
+        m_k50_state_1 = *data;
+        m_k50_state_2 = *(data+1);
+        emit k50_stateChanged();
 
-        qDebug("k50状态 = %d-%d", flags1, flags2);
+        qDebug("k50状态 = %x-%x", m_k50_state_1, m_k50_state_2);
     }
 
     // 预热剩余时间
@@ -613,4 +614,78 @@ void Bluetooth::slot_1800_characteristicRead(const QLowEnergyCharacteristic &cha
     {
         qDebug() << "DeviceName = " << value;
     }
+}
+
+/**
+ * @brief DeviceFinder::devices 获得K50状态
+ * @return
+ */
+QVariant Bluetooth::get_k50_state_1()
+{
+    return QVariant::fromValue(m_k50_state_1);
+}
+
+/**
+ * @brief DeviceFinder::devices 获得K50状态
+ * @return
+ */
+QVariant Bluetooth::get_k50_state_2()
+{
+    return QVariant::fromValue(m_k50_state_2);
+}
+
+/**
+ * @brief Bluetooth::calibration_1_callback  校准
+ */
+void Bluetooth::calibration_1_callback()
+{
+    if( (m_k50_state_2 & 0x03) == 0x01 )
+        return;
+
+    QByteArray ch;
+    ch.resize(1);
+    ch[0] = 1;
+    m_service_1a00->writeCharacteristic(Char_1a04, ch, QLowEnergyService::WriteWithResponse);
+}
+
+/**
+ * @brief Bluetooth::calibration_1_callback  校准
+ */
+void Bluetooth::calibration_2_callback()
+{
+    if( ((m_k50_state_2 >> 2) & 0x03) == 0x01 )
+        return;
+
+    QByteArray ch;
+    ch.resize(1);
+    ch[0] = 1;
+    m_service_1a00->writeCharacteristic(Char_1a05, ch, QLowEnergyService::WriteWithResponse);
+}
+
+/**
+ * @brief Bluetooth::calibration_1_callback  校准
+ */
+void Bluetooth::calibration_3_callback()
+{
+    if( ((m_k50_state_2 >> 4) & 0x03) == 0x01 )
+        return;
+
+    QByteArray ch;
+    ch.resize(1);
+    ch[0] = 1;
+    m_service_1a00->writeCharacteristic(Char_1a06, ch, QLowEnergyService::WriteWithResponse);
+}
+
+/**
+ * @brief Bluetooth::calibration_1_callback  校准
+ */
+void Bluetooth::calibration_4_callback()
+{
+    if( ((m_k50_state_2 >> 6) & 0x03) == 0x01 )
+        return;
+
+    QByteArray ch;
+    ch.resize(1);
+    ch[0] = 1;
+    m_service_1a00->writeCharacteristic(Char_1a07, ch, QLowEnergyService::WriteWithResponse);
 }

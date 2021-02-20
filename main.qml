@@ -61,13 +61,97 @@ ApplicationWindow {
     width: 360
     height: 520
     visible: true
-    title: "Qt Quick Controls 2"
+    title: "VOCO"
 
     property string scan_state : qsTr("点击按钮开始寻找设备")
     property string connect_status : qsTr("未连接到设备")
     property string led_color : "black"
     property string current_user_name : "未选择"
     property string current_wristband_addr : ""
+
+    property bool calibration_busy1
+    property bool calibration_busy2
+    property bool calibration_busy3
+    property bool calibration_busy4
+    property string calibration_lable1
+    property string calibration_lable2
+    property string calibration_lable3
+    property string calibration_lable4
+
+    Connections {
+        target: buletooth
+        onK50_stateChanged:
+        {
+//            console.log("k50 state = ", buletooth.k50_state_1, "-", buletooth.k50_state_2)
+            switch(buletooth.k50_state_2 & 0x03)
+            {
+            case 0x00:
+                calibration_lable1 = qsTr("未校准")
+                calibration_busy1 = false
+                break;
+            case 0x01:
+                calibration_lable1 = qsTr("正在校准")
+                calibration_busy1 = true
+                break;
+            case 0x02:
+                calibration_lable1 = qsTr("校准完成")
+                calibration_busy1 = false
+                break;
+            default:break;
+            }
+
+            switch((buletooth.k50_state_2 >> 2) & 0x03)
+            {
+            case 0x00:
+                calibration_lable2 = qsTr("未校准")
+                calibration_busy2 = false
+                break;
+            case 0x01:
+                calibration_lable2 = qsTr("正在校准")
+                calibration_busy2 = true
+                break;
+            case 0x02:
+                calibration_lable2 = qsTr("校准完成")
+                calibration_busy2 = false
+                break;
+            default:break;
+            }
+
+            switch((buletooth.k50_state_2 >> 4) & 0x03)
+            {
+            case 0x00:
+                calibration_lable3 = qsTr("未校准")
+                calibration_busy3 = false
+                break;
+            case 0x01:
+                calibration_lable3 = qsTr("正在校准")
+                calibration_busy3 = true
+                break;
+            case 0x02:
+                calibration_lable3 = qsTr("校准完成")
+                calibration_busy3 = false
+                break;
+            default:break;
+            }
+
+            switch((buletooth.k50_state_2 >> 6) & 0x03)
+            {
+            case 0x00:
+                calibration_lable4 = qsTr("未校准")
+                calibration_busy4 = false
+                break;
+            case 0x01:
+                calibration_lable4 = qsTr("正在校准")
+                calibration_busy4 = true
+                break;
+            case 0x02:
+                calibration_lable4 = qsTr("校准完成")
+                calibration_busy4 = false
+                break;
+            default:break;
+            }
+        }
+    }
 
     Settings {
         id: settings

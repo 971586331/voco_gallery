@@ -35,6 +35,8 @@ class Bluetooth : public QObject
     Q_OBJECT
 
     Q_PROPERTY(QVariant devices READ get_devices_list NOTIFY devicesChanged)
+    Q_PROPERTY(QVariant k50_state_1 READ get_k50_state_1 NOTIFY k50_stateChanged)
+    Q_PROPERTY(QVariant k50_state_2 READ get_k50_state_2 NOTIFY k50_stateChanged)
 
 public:
     Bluetooth(QObject *object);
@@ -46,8 +48,16 @@ public:
     Q_INVOKABLE void connect_device(const QString &address);
     QVariant get_devices_list();
     bool device_is_exist(QList<QObject*> &devices, const QBluetoothDeviceInfo &info);
+    QVariant get_k50_state_1();
+    QVariant get_k50_state_2();
+    Q_INVOKABLE void calibration_1_callback();
+    Q_INVOKABLE void calibration_2_callback();
+    Q_INVOKABLE void calibration_3_callback();
+    Q_INVOKABLE void calibration_4_callback();
 
     QList<QObject*> m_devices;
+    quint8 m_k50_state_1;
+    quint8 m_k50_state_2;
 
     QObject *g_rootObject;
     QBluetoothDeviceInfo currentDeviceInfo;
@@ -94,6 +104,7 @@ public:
 
 signals:
     void devicesChanged();
+    void k50_stateChanged();
 
 private slots:
     void addBlueToothDevicesToList(const QBluetoothDeviceInfo &info);
