@@ -8,6 +8,7 @@
 #include <QQmlApplicationEngine>
 #include <QLowEnergyController>
 #include <QBluetoothDeviceInfo>
+#include "user_info.h"
 
 #define UUID_1900   "BBD71900-3F8A-4CCE-BD68-2C3827C286FF"
 #define UUID_1901   "BBD71901-3F8A-4CCE-BD68-2C3827C286FF"
@@ -39,13 +40,13 @@ class Bluetooth : public QObject
     Q_PROPERTY(QVariant k50_state_2 READ get_k50_state_2 NOTIFY k50_stateChanged)
 
 public:
-    Bluetooth(QObject *object);
+    Bluetooth(QObject *object, user_info ** info);
 
     Q_INVOKABLE QString get_local_name();
     Q_INVOKABLE QString get_local_address();
     Q_INVOKABLE void ble_start_scan();
     Q_INVOKABLE void ble_stop_scan();
-    Q_INVOKABLE void connect_device(const QString &address);
+    Q_INVOKABLE int connect_device(const QString &address);
     QVariant get_devices_list();
     bool device_is_exist(QList<QObject*> &devices, const QBluetoothDeviceInfo &info);
     QVariant get_k50_state_1();
@@ -59,6 +60,7 @@ public:
     quint8 m_k50_state_1;
     quint8 m_k50_state_2;
 
+    user_info **active_user = nullptr;
     QObject *g_rootObject;
     QBluetoothDeviceInfo currentDeviceInfo;
     void ble_connect_device(QBluetoothDeviceInfo info);

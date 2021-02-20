@@ -23,12 +23,12 @@ public:
     Bluetooth *buletooth;
     JsonHandle *user_info_obj;
 
-    user_info *active_user;
+    user_info *active_user = nullptr;
     QSettings *sys_settings;
     QSettings *user_info_settings;
     QList<QObject *> m_user_info;
     QVariant get_user_info_list();
-    Q_INVOKABLE bool add_user(QString nmae, int age, double height, double weight);
+    Q_INVOKABLE bool add_user(QString nmae, int age, float height, float weight);
     Q_INVOKABLE bool delete_user(int index);
     Q_INVOKABLE bool switch_user(int index);
     Q_INVOKABLE void set_wristband_addr(QString addr);

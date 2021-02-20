@@ -21,12 +21,12 @@ int user_info::getAge() const
     return age;
 }
 
-double user_info::getHeight() const
+float user_info::getHeight() const
 {
     return height;
 }
 
-double user_info::getWeight() const
+float user_info::getWeight() const
 {
     return weight;
 }

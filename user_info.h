@@ -19,13 +19,13 @@ public:
 
     QString name;       // 名字
     int age;            // 年龄
-    double height;      // 身高
-    double weight;      // 体重
+    float height;      // 身高
+    float weight;      // 体重
 
     QString getName() const;
     int getAge() const;
-    double getHeight() const;
-    double getWeight() const;
+    float getHeight() const;
+    float getWeight() const;
 
 signals:
     void InfoChanged();
@@ -36,8 +36,8 @@ struct user_info_t
 {
     QString name;       // 名字
     int age;            // 年龄
-    double height;      // 身高
-    double weight;      // 体重
+    float height;      // 身高
+    float weight;      // 体重
 };
 
 Q_DECLARE_METATYPE(struct user_info_t)

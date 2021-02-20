@@ -23,7 +23,7 @@ mainwindow::mainwindow(QObject *parent) : QObject(parent)
     g_rootObject = lv_component.create();
     g_rootObject->setParent(this);
 
-    buletooth = new Bluetooth(g_rootObject);
+    buletooth = new Bluetooth(g_rootObject, &active_user);
     g_qmlEngine->rootContext()->setContextProperty("buletooth", buletooth);
 
     // 用户信息
@@ -83,7 +83,7 @@ QVariant mainwindow::get_user_info_list()
  * @param weight
  * @return
  */
-bool mainwindow::add_user(QString name, int age, double height, double weight)
+bool mainwindow::add_user(QString name, int age, float height, float weight)
 {
     if( name.isEmpty() )
         return false;

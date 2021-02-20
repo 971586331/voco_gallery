@@ -11,8 +11,9 @@
 #include <QRandomGenerator>
 #include <QString>
 #include <QBluetoothSocket>
+#include <QDateTime>
 
-Bluetooth::Bluetooth(QObject *obj) : g_rootObject(obj)
+Bluetooth::Bluetooth(QObject *obj, user_info ** info) : g_rootObject(obj), active_user(info)
 {
 
     m_localDevice = new QBluetoothLocalDevice();
@@ -125,8 +126,11 @@ QVariant Bluetooth::get_devices_list()
  * @brief Bluetooth::connect_device 连接到设备，供UI调用
  * @param address   设备Mac地址
  */
-void Bluetooth::connect_device(const QString &address)
+int Bluetooth::connect_device(const QString &address)
 {
+    if( *active_user == nullptr )
+        return -2;
+
     ble_stop_scan();
 
     for ( int i=0; i!=m_devices.size(); ++i )
@@ -136,11 +140,12 @@ void Bluetooth::connect_device(const QString &address)
         {
             currentDeviceInfo = info->getDevice();
             ble_connect_device(currentDeviceInfo);
-            break;
+            return 0;
         }
     }
 
     // 没有这个设备
+    return -1;
 }
 
 /**
@@ -149,6 +154,7 @@ void Bluetooth::connect_device(const QString &address)
  */
 void Bluetooth::ble_connect_device(QBluetoothDeviceInfo info)
 {
+    g_rootObject->setProperty("scan_state", tr("正在连接：") + info.address().toString() + "...");
     // Make connections
     //! [Connect-Signals-1]
     m_control = QLowEnergyController::createCentral(info, this);
@@ -436,11 +442,31 @@ void Bluetooth::slot_1a00_serviceStateChanged(QLowEnergyService::ServiceState s)
             {
                 qDebug("(error)0x1a02 not found.");
             }
+            // 发送体重
+            QByteArray array_1a02;
+            array_1a02.resize(sizeof(float));
+            float value_1a02 = (*active_user)->getWeight();
+            memcpy(array_1a02.data(), &value_1a02, sizeof(float));
+            QByteArray array_1a02_2;
+            array_1a02_2.resize(sizeof(float));
+            for(int i=0; i<sizeof(float); i++)
+                array_1a02_2[i] = array_1a02[sizeof(float)-i-1];
+            qDebug() << "array_1a02_2 = " << array_1a02;
+            m_service_1a00->writeCharacteristic(Char_1a02, array_1a02_2, QLowEnergyService::WriteWithResponse);
+
             Char_1a03 = m_service_1a00->characteristic(QBluetoothUuid(QString(UUID_1A03)));
             if (!Char_1a03.isValid())
             {
                 qDebug("(error)0x1a03 not found.");
             }
+            // 发送时间戳
+            QByteArray array_1a03;
+            array_1a03.resize(sizeof(int));
+            QDateTime time = QDateTime::currentDateTime();   //获取当前时间
+            int value_1a03 = time.toTime_t();
+            memcpy(array_1a03.data(), &value_1a03, sizeof(float));
+            m_service_1a00->writeCharacteristic(Char_1a03, array_1a03, QLowEnergyService::WriteWithResponse);
+
             Char_1a04 = m_service_1a00->characteristic(QBluetoothUuid(QString(UUID_1A04)));
             if (!Char_1a04.isValid())
             {

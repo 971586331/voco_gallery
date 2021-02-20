@@ -11,6 +11,12 @@ Page {
 
     property int select_index
 
+    MsgDialog {
+        id: msgdialog_warning
+        tipText : qsTr("没有指定用户，请指定用户后再连接设备！")
+        tipImage : "qrc:/images/warning.png"
+    }
+
     // 设备列表的样式
     Rectangle
     {
@@ -31,8 +37,12 @@ Page {
                         console.log("onClicked = ", modelData.deviceAddress)
                         buletooth.ble_stop_scan()
                         select_index = index
-                        window.scan_state = qsTr("正在连接：") + modelData.deviceAddress + "..."
-                        buletooth.connect_device(modelData.deviceAddress)
+//                        window.scan_state = qsTr("正在连接：") + modelData.deviceAddress + "..."
+                        var ret = buletooth.connect_device(modelData.deviceAddress)
+                        if( ret === -2 )
+                        {
+                            msgdialog_warning.openMsg()
+                        }
                     }
                 }
 
