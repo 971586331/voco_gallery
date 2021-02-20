@@ -28,7 +28,6 @@ Page {
                 MouseArea {
                 anchors.fill: parent
                     onClicked: {
-                        console.log("onClicked = ")
                         select_index = index
                     }
                 }

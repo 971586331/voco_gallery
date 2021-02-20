@@ -118,7 +118,7 @@ Page {
                 highlight: Rectangle { color: "lightsteelblue"; radius: 5 }
                 clip: true
                 focus:true
-                currentIndex : connect_page.select_index
+                currentIndex : select_index
 
                 delegate: contactDelegate
             }
@@ -137,7 +137,7 @@ Page {
                 anchors.verticalCenter: parent.verticalCenter
                 onClicked:
                 {
-                    connect_page.select_index = 0
+                    select_index = 0
                     buletooth.ble_start_scan()
                 }
             }
