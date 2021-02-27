@@ -9,6 +9,7 @@
 #include <QLowEnergyController>
 #include <QBluetoothDeviceInfo>
 #include "user_info.h"
+#include <QTimer>
 
 #define UUID_1900   "BBD71900-3F8A-4CCE-BD68-2C3827C286FF"
 #define UUID_1901   "BBD71901-3F8A-4CCE-BD68-2C3827C286FF"
@@ -56,6 +57,7 @@ public:
     Q_INVOKABLE void calibration_3_callback();
     Q_INVOKABLE void calibration_4_callback();
 
+    QString wb_name;
     QList<QObject*> m_devices;
     quint8 m_k50_state_1;
     quint8 m_k50_state_2;
@@ -128,9 +130,13 @@ private slots:
     void slot_1b00_serviceStateChanged(QLowEnergyService::ServiceState s);
     void slot_1b00_updateValue(const QLowEnergyCharacteristic &c, const QByteArray &value);
 
+    void on_wb_state_time_timeout();
+
 private:
     QBluetoothLocalDevice *m_localDevice;
     QBluetoothDeviceDiscoveryAgent *discoveryAgent;
+
+    QTimer *wb_state_time;
 
 };
 

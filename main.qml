@@ -65,7 +65,10 @@ ApplicationWindow {
 
     property string scan_state : qsTr("点击按钮开始寻找设备")
     property string connect_status : qsTr("未连接VOCO设备")
-    property string led_color : "black"
+    property string wb_connect_status : qsTr("未连接手环")
+    property string wb_name
+    property string voco_led_color : "black"
+    property string wb_led_color : "black"
     property string current_user_name : qsTr("未选择")
     property string current_wristband_addr : ""
 
@@ -318,10 +321,37 @@ ApplicationWindow {
     StackView {
         id: stackView
         anchors.fill: parent
+        initialItem: mian_pane1
 
-        initialItem: Pane {
-            id: pane
+        Pane {
+            id: mian_pane2
+            anchors.fill: parent
 
+            Label {
+                anchors.left : parent.left
+                anchors.leftMargin : 20
+                text: "sss"
+                font.pixelSize: 16
+            }
+            Button
+            {
+                id : quit_monitor_button
+                text: "退出监控"
+                anchors.bottom:  parent.bottom
+                anchors.bottomMargin: 20
+                anchors.horizontalCenter: parent.horizontalCenter
+
+                onClicked:
+                {
+
+                    stackView.pop()
+                }
+            }
+        }
+
+        Pane {
+            id: mian_pane1
+            anchors.fill: parent
 
             StatusIndicator {
                 id: connect_status_led
@@ -329,9 +359,8 @@ ApplicationWindow {
                 anchors.leftMargin : 10
                 anchors.top : parent.top
                 anchors.topMargin : 10
-                color: window.led_color
+                color: window.voco_led_color
                 active: true
-
             }
             Label {
                 anchors.left : connect_status_led.right
@@ -340,20 +369,56 @@ ApplicationWindow {
                 text: connect_status
                 font.pixelSize: 16
             }
+            StatusIndicator {
+                id: wb_connect_status_led
+                anchors.left : parent.left
+                anchors.leftMargin : 10
+                anchors.top : connect_status_led.bottom
+                anchors.topMargin : 10
+                color: window.wb_led_color
+                active: true
+            }
+            Label {
+                id: wb_connect_status_label
+                anchors.left : wb_connect_status_led.right
+                anchors.leftMargin : 20
+                anchors.verticalCenter: wb_connect_status_led.verticalCenter
+                text: window.wb_connect_status + wb_name
+                font.pixelSize: 16
+            }
+            Label {
+                anchors.left : parent.left
+                anchors.leftMargin : 20
+                anchors.bottom: enter_monitor_button.top
+                anchors.bottomMargin: 20
+                text: "设备工作状态："
+                font.pixelSize: 16
+            }
             Button
             {
                 text: "test"
-                anchors.top:  connect_status_led.bottom
-                anchors.topMargin: 20
+                anchors.bottom:  parent.bottom
+                anchors.bottomMargin: 20
+                anchors.left: parent.left
                 onClicked:
                 {
-                    mainwindow.button_test()
+//                    mainwindow.button_test()
                 }
             }
-        }
+            Button
+            {
+                id : enter_monitor_button
+//                enabled: false
+                text: "进入监控"
+                anchors.bottom:  parent.bottom
+                anchors.bottomMargin: 20
+                anchors.horizontalCenter: parent.horizontalCenter
 
-        Pane {
-
+                onClicked:
+                {
+                    stackView.push(mian_pane2)
+                }
+            }
         }
     }
 

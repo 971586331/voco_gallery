@@ -12,6 +12,7 @@
 #include <QString>
 #include <QBluetoothSocket>
 #include <QDateTime>
+#include <QTimer>
 
 Bluetooth::Bluetooth(QObject *obj, user_info ** info) : g_rootObject(obj), active_user(info)
 {
@@ -23,6 +24,10 @@ Bluetooth::Bluetooth(QObject *obj, user_info ** info) : g_rootObject(obj), activ
                 this,
                 SLOT(addBlueToothDevicesToList(QBluetoothDeviceInfo)));
     connect(discoveryAgent,SIGNAL(finished()),this,SLOT(slot_device_finished()));
+
+    wb_state_time = new QTimer(this);
+    wb_state_time->start(5*1000);
+    connect(wb_state_time, SIGNAL(timeout()), this, SLOT(on_wb_state_time_timeout()));
 }
 
 /**
@@ -131,6 +136,7 @@ int Bluetooth::connect_device(const QString &address)
     if( *active_user == nullptr )
         return -2;
 
+    wb_name.clear();
     ble_stop_scan();
 
     for ( int i=0; i!=m_devices.size(); ++i )
@@ -177,9 +183,9 @@ void Bluetooth::ble_connect_device(QBluetoothDeviceInfo info)
     connect(m_control, &QLowEnergyController::connected, this, [this]()
     {
         qDebug("控制器连接.搜索服务……");
-        g_rootObject->setProperty("scan_state", QString("已经连接到VOCO:").append(currentDeviceInfo.name()));
-        g_rootObject->setProperty("connect_status", QString("已经连接到VOCO:").append(currentDeviceInfo.name()));
-        g_rootObject->setProperty("led_color", "green");
+        g_rootObject->setProperty("scan_state", QString("已经连接到VOCO：").append(currentDeviceInfo.name()));
+        g_rootObject->setProperty("connect_status", QString("已经连接到VOCO：").append(currentDeviceInfo.name()));
+        g_rootObject->setProperty("voco_led_color", "green");
         m_control->discoverServices();
     });
 
@@ -188,7 +194,7 @@ void Bluetooth::ble_connect_device(QBluetoothDeviceInfo info)
         qDebug("LowEnergy控制器断开连接");
         g_rootObject->setProperty("scan_state", tr("连接断开，请点击按钮开始寻找设备并连接！"));
         g_rootObject->setProperty("connect_status", tr("未连接VOCO设备"));
-        g_rootObject->setProperty("led_color", "black");
+        g_rootObject->setProperty("voco_led_color", "black");
     });
 
     // Connect
@@ -246,7 +252,7 @@ void Bluetooth::slot_serviceDiscovered(const QBluetoothUuid &gatt)
                 connect(m_service_1900, &QLowEnergyService::characteristicRead, this, &Bluetooth::slot_1900_characteristicRead);
                 m_service_1900->discoverDetails();
             } else {
-                qDebug("1A00服务没有找到！");
+                qDebug("1900服务没有找到！");
             }
 
         }
@@ -338,6 +344,21 @@ void Bluetooth::slot_hr_updateHeartRateValue(const QLowEnergyCharacteristic &c, 
         hrvalue = static_cast<int>(data[1]);
 
     qDebug("心率 = %d", hrvalue);
+
+    wb_state_time->start(5*1000);
+    g_rootObject->setProperty("wb_connect_status", tr("已连接到手环："));
+    g_rootObject->setProperty("wb_name", wb_name);
+    g_rootObject->setProperty("wb_led_color", "green");
+}
+
+/**
+ * @brief Bluetooth::on_wb_state_time_timeout 判断手环是否连接
+ */
+void Bluetooth::on_wb_state_time_timeout()
+{
+    g_rootObject->setProperty("wb_connect_status", tr("未连接手环"));
+    g_rootObject->setProperty("wb_name", "");
+    g_rootObject->setProperty("wb_led_color", "black");
 }
 
 /**
@@ -356,20 +377,26 @@ void Bluetooth::slot_1900_serviceStateChanged(QLowEnergyService::ServiceState s)
             qDebug("1900 Service discovered.");
 
             Char_1901 = m_service_1900->characteristic(QBluetoothUuid(QString(UUID_1901)));
-            if (!Char_1a01.isValid())
+            if (!Char_1901.isValid())
             {
                 qDebug("(error)0x1901 not found.");
             }
+            m_service_1900->readCharacteristic(Char_1901);
+
             Char_1902 = m_service_1900->characteristic(QBluetoothUuid(QString(UUID_1902)));
             if (!Char_1902.isValid())
             {
                 qDebug("(error)0x1902 not found.");
             }
+            m_service_1900->readCharacteristic(Char_1902);
+
             Char_1903 = m_service_1900->characteristic(QBluetoothUuid(QString(UUID_1903)));
             if (!Char_1903.isValid())
             {
                 qDebug("(error)0x1903 not found.");
             }
+            m_service_1900->readCharacteristic(Char_1903);
+
             Char_1908 = m_service_1900->characteristic(QBluetoothUuid(QString(UUID_1908)));
             if (!Char_1908.isValid())
             {
@@ -393,14 +420,22 @@ void Bluetooth::slot_1900_characteristicRead(const QLowEnergyCharacteristic &cha
     if(characteristic.uuid() == QBluetoothUuid(QBluetoothUuid(QString(UUID_1901))))
     {
         qDebug() << "手环生产厂商 = " << value;
+//        QString str = QString(value);
+//        wb_name.append(str);
     }
     if(characteristic.uuid() == QBluetoothUuid(QBluetoothUuid(QString(UUID_1902))))
     {
         qDebug() << "手环产品型号 = " << value;
+        QString str = QString(value);
+//        wb_name.append(" - ");
+        wb_name.append(str);
     }
     if(characteristic.uuid() == QBluetoothUuid(QBluetoothUuid(QString(UUID_1903))))
     {
         qDebug() << "手环产品序列号 = " << value;
+        QString str = QString(value);
+        wb_name.append(" - ");
+        wb_name.append(str);
     }
     if(characteristic.uuid() == QBluetoothUuid(QBluetoothUuid(QString(UUID_1908))))
     {
