@@ -55,6 +55,7 @@ import QtQuick.Controls.Material 2.12
 import QtQuick.Controls.Universal 2.12
 import Qt.labs.settings 1.0
 import QtQuick.Extras 1.4
+import "./mypages"
 
 ApplicationWindow {
     id: window
@@ -71,6 +72,7 @@ ApplicationWindow {
     property string wb_led_color : "black"
     property string current_user_name : qsTr("未选择")
     property string current_wristband_addr : ""
+    property string device_state : "离线状态"
 
     property bool calibration_busy1
     property bool calibration_busy2
@@ -81,11 +83,25 @@ ApplicationWindow {
     property string calibration_lable3 : qsTr("未校准")
     property string calibration_lable4 : qsTr("未校准")
 
+    property var sensor_data_qml
+
     Connections {
         target: buletooth
         onK50_stateChanged:
         {
 //            console.log("k50 state = ", buletooth.k50_state_1, "-", buletooth.k50_state_2)
+            switch(buletooth.k50_state_1)
+            {
+            case 0x00: device_state = "离线状态"; enter_monitor_button.enabled = false; break;
+            case 0x01: device_state = "初始状态"; break;
+            case 0x02: device_state = "预热中，剩余 " + buletooth.warm_up_remaining_time + " 分钟"; break;
+            case 0x03: device_state = "预热完成，但没收到体重数据和时间戳"; break;
+            case 0x04: device_state = "准备就绪"; enter_monitor_button.enabled = true; break;
+            case 0x05: device_state = "正在接收传感器数据包"; break;
+            case 0x06: device_state = "暂停接收传感器数据包"; break;
+            default:break;
+            }
+
             switch(buletooth.k50_state_2 & 0x03)
             {
             case 0x00:
@@ -153,6 +169,12 @@ ApplicationWindow {
                 break;
             default:break;
             }
+        }
+
+        onSensor_dataChanged:
+        {
+            console.log("onSensor_dataChanged")
+            sensor_data_qml = buletooth.sensor_data
         }
     }
 
@@ -318,6 +340,22 @@ ApplicationWindow {
         }
     }
 
+    ConfirmDialog
+    {
+        id: confirmDialog
+        i_title: "确认操作"
+        i_message: "是否要退出监控？(这样会停止采集设备的数据)"
+        onAccepted:
+        {
+            // 停止数据采集
+            if( buletooth.k50_state_1 === 0x05 )
+            {
+                buletooth.stop_data_collection()
+            }
+            stackView.pop()
+        }
+    }
+
     StackView {
         id: stackView
         anchors.fill: parent
@@ -327,12 +365,112 @@ ApplicationWindow {
             id: mian_pane2
             anchors.fill: parent
 
-            Label {
-                anchors.left : parent.left
-                anchors.leftMargin : 20
-                text: "sss"
-                font.pixelSize: 16
-            }
+             GridLayout {
+                 id: sensor_data_grid
+                 anchors.top: parent.top
+                 anchors.topMargin: 10
+                 x: 20
+                 width: parent.width - 40
+                 rowSpacing: 5
+                 columns: 2
+                 rows: 16
+                 Label {
+                     text: qsTr("Timestamp:")
+                 }
+                 Label {
+                    text: sensor_data_qml.time
+                 }
+                 Label {
+                     text: qsTr("VO2 in ml/min/kg:")
+                 }
+                 Label {
+                    text: sensor_data_qml.vo2
+                 }
+                 Label {
+                     text: qsTr("Breath Rate in breaths/minute:")
+                 }
+                 Label {
+                    text: sensor_data_qml.br
+                 }
+                 Label {
+                     text: qsTr("O2%:")
+                 }
+                 Label {
+                    text: sensor_data_qml.o2
+                 }
+                 Label {
+                     text: qsTr("Tidal Volume in Litre:")
+                 }
+                 Label {
+                    text: sensor_data_qml.tvl
+                 }
+                 Label {
+                     text: qsTr("Total Calories Burned:")
+                 }
+                 Label {
+                    text: sensor_data_qml.tcb
+                 }
+                 Label {
+                     text: qsTr("Flow in L/s:")
+                 }
+                 Label {
+                    text: sensor_data_qml.flow
+                 }
+                 Label {
+                     text: qsTr("VE in L/min:")
+                 }
+                 Label {
+                    text: sensor_data_qml.ve
+                 }
+                 Label {
+                     text: qsTr("CO2%:")
+                 }
+                 Label {
+                    text: sensor_data_qml.co2
+                 }
+                 Label {
+                     text: qsTr("VCO2 in ml/min:")
+                 }
+                 Label {
+                    text: sensor_data_qml.vco2
+                 }
+                 Label {
+                     text: qsTr("RER:")
+                 }
+                 Label {
+                    text: sensor_data_qml.rer
+                 }
+                 Label {
+                     text: qsTr("ETO2 in %:")
+                 }
+                 Label {
+                    text: sensor_data_qml.eto2
+                 }
+                 Label {
+                     text: qsTr("ETCO2 in %::")
+                 }
+                 Label {
+                    text: sensor_data_qml.etco2
+                 }
+                 Label {
+                     text: qsTr("Pressure in kPa:")
+                 }
+                 Label {
+                    text: sensor_data_qml.pressure
+                 }
+                 Label {
+                     text: qsTr("Temperature in °C:")
+                 }
+                 Label {
+                    text: sensor_data_qml.temp
+                 }
+                 Label {
+                     text: qsTr("RH in %:")
+                 }
+                 Label {
+                    text: sensor_data_qml.rh
+                 }
+             }
             Button
             {
                 id : quit_monitor_button
@@ -343,8 +481,7 @@ ApplicationWindow {
 
                 onClicked:
                 {
-
-                    stackView.pop()
+                    confirmDialog.open();
                 }
             }
         }
@@ -387,38 +524,48 @@ ApplicationWindow {
                 font.pixelSize: 16
             }
             Label {
-                anchors.left : parent.left
-                anchors.leftMargin : 20
-                anchors.bottom: enter_monitor_button.top
-                anchors.bottomMargin: 20
+                id: label_device_state
+                anchors.top: wb_connect_status_label.bottom
+                anchors.topMargin: 20
+                anchors.horizontalCenter: parent.horizontalCenter
                 text: "设备工作状态："
+                font.pixelSize: 16
+            }
+            Label {
+                anchors.top: label_device_state.bottom
+                anchors.topMargin: 20
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: device_state
                 font.pixelSize: 16
             }
             Button
             {
-                text: "test"
-                anchors.bottom:  parent.bottom
-                anchors.bottomMargin: 20
-                anchors.left: parent.left
-                onClicked:
-                {
-//                    mainwindow.button_test()
-                }
-            }
-            Button
-            {
                 id : enter_monitor_button
-//                enabled: false
+                enabled: false
                 text: "进入监控"
                 anchors.bottom:  parent.bottom
                 anchors.bottomMargin: 20
                 anchors.horizontalCenter: parent.horizontalCenter
-
                 onClicked:
                 {
+                    if( buletooth.k50_state_1 !== 0x05 )
+                    {
+                        buletooth.start_data_collection()
+                    }
                     stackView.push(mian_pane2)
                 }
             }
+//            Button
+//            {
+//                text: "test"
+//                anchors.bottom:  parent.bottom
+//                anchors.bottomMargin: 20
+//                anchors.left: parent.left
+//                onClicked:
+//                {
+////                    mainwindow.button_test()
+//                }
+//            }
         }
     }
 

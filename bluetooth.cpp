@@ -614,9 +614,10 @@ void Bluetooth::slot_1b00_updateValue(const QLowEnergyCharacteristic &c, const Q
             return;
         }
         auto data = reinterpret_cast<const quint8 *>(value.constData());
-        quint8 flags1 = *data;
+        m_warm_up_remaining_time = *data;
+        emit k50_stateChanged();
 
-        qDebug("预热剩余时间 = %d", flags1);
+        qDebug("预热剩余时间 = %d", m_warm_up_remaining_time);
     }
 
     // 呼吸数据包
@@ -629,11 +630,48 @@ void Bluetooth::slot_1b00_updateValue(const QLowEnergyCharacteristic &c, const Q
         }
         auto data = reinterpret_cast<const quint8 *>(value.constData());
 
-        qDebug("呼吸数据包 = ");
-        for( int i=0; i<56; i++ )
-            qDebug("%d ", data[i]);
-    }
+//        qDebug("呼吸数据包 = ");
+//        for( int i=0; i<56; i++ )
+//            qDebug("%d ", data[i]);
 
+        struct sensor_data_t sensor_data;
+        memcpy(&sensor_data, data, 56);
+
+//        qDebug("sensor_data.time = %d ", sensor_data.time);
+//        qDebug("sensor_data.vo2 = %d ", sensor_data.vo2);
+//        qDebug("sensor_data.br = %d ", sensor_data.br);
+//        qDebug("sensor_data.o2 = %f ", sensor_data.o2);
+//        qDebug("sensor_data.tvl = %f ", sensor_data.tvl);
+//        qDebug("sensor_data.tcb = %f ", sensor_data.tcb);
+//        qDebug("sensor_data.flow = %f ", sensor_data.flow);
+//        qDebug("sensor_data.ve = %f ", sensor_data.ve);
+//        qDebug("sensor_data.co2 = %f ", sensor_data.co2);
+//        qDebug("sensor_data.vco2 = %f ", sensor_data.vco2);
+//        qDebug("sensor_data.rer = %f ", sensor_data.rer);
+//        qDebug("sensor_data.eto2 = %f ", sensor_data.eto2);
+//        qDebug("sensor_data.etco2 = %f ", sensor_data.etco2);
+//        qDebug("sensor_data.pressure = %f ", sensor_data.pressure);
+//        qDebug("sensor_data.temp = %d ", sensor_data.temp);
+//        qDebug("sensor_data.rh = %d ", sensor_data.rh);
+        sensor_data_map.clear();
+        sensor_data_map.insert("time", QString::number(sensor_data.time));
+        sensor_data_map.insert("vo2", QString::number(sensor_data.vo2));
+        sensor_data_map.insert("br", QString::number(sensor_data.br));
+        sensor_data_map.insert("o2", QString("%1").arg(sensor_data.o2));
+        sensor_data_map.insert("tvl", QString("%1").arg(sensor_data.tvl));
+        sensor_data_map.insert("tcb", QString("%1").arg(sensor_data.tcb));
+        sensor_data_map.insert("flow", QString("%1").arg(sensor_data.flow));
+        sensor_data_map.insert("ve", QString("%1").arg(sensor_data.ve));
+        sensor_data_map.insert("co2", QString("%1").arg(sensor_data.co2));
+        sensor_data_map.insert("vco2", QString("%1").arg(sensor_data.vco2));
+        sensor_data_map.insert("rer", QString("%1").arg(sensor_data.rer));
+        sensor_data_map.insert("eto2", QString("%1").arg(sensor_data.eto2));
+        sensor_data_map.insert("etco2", QString("%1").arg(sensor_data.etco2));
+        sensor_data_map.insert("pressure", QString("%1").arg(sensor_data.pressure));
+        sensor_data_map.insert("temp", QString::number(sensor_data.temp));
+        sensor_data_map.insert("rh", QString::number(sensor_data.rh));
+        emit sensor_dataChanged();
+    }
 }
 
 /**
@@ -678,7 +716,7 @@ void Bluetooth::slot_1800_characteristicRead(const QLowEnergyCharacteristic &cha
 }
 
 /**
- * @brief DeviceFinder::devices 获得K50状态
+ * @brief Bluetooth::get_k50_state_1 获得K50状态
  * @return
  */
 QVariant Bluetooth::get_k50_state_1()
@@ -687,12 +725,30 @@ QVariant Bluetooth::get_k50_state_1()
 }
 
 /**
- * @brief DeviceFinder::devices 获得K50状态
+ * @brief Bluetooth::get_k50_state_2 获得K50状态
  * @return
  */
 QVariant Bluetooth::get_k50_state_2()
 {
     return QVariant::fromValue(m_k50_state_2);
+}
+
+/**
+ * @brief Bluetooth::get_warm_up_remaining_time 获得预热剩余时间
+ * @return
+ */
+QVariant Bluetooth::get_warm_up_remaining_time()
+{
+    return QVariant::fromValue(m_warm_up_remaining_time);
+}
+
+/**
+ * @brief Bluetooth::get_sensor_data 获得传感器数据
+ * @return
+ */
+QVariantMap Bluetooth::get_sensor_data()
+{
+ return sensor_data_map;
 }
 
 /**
@@ -749,4 +805,26 @@ void Bluetooth::calibration_4_callback()
     ch.resize(1);
     ch[0] = 1;
     m_service_1a00->writeCharacteristic(Char_1a07, ch, QLowEnergyService::WriteWithResponse);
+}
+
+/**
+ * @brief Bluetooth::start_data_collection  开始数据采集
+ */
+void Bluetooth::start_data_collection()
+{
+    QByteArray ch;
+    ch.resize(1);
+    ch[0] = 1;
+    m_service_1a00->writeCharacteristic(Char_1a08, ch, QLowEnergyService::WriteWithResponse);
+}
+
+/**
+ * @brief Bluetooth::stop_data_collection  停止数据采集
+ */
+void Bluetooth::stop_data_collection()
+{
+    QByteArray ch;
+    ch.resize(1);
+    ch[0] = 0;
+    m_service_1a00->writeCharacteristic(Char_1a08, ch, QLowEnergyService::WriteWithResponse);
 }

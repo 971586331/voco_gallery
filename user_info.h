@@ -15,7 +15,7 @@ class user_info : public QObject
 
 public:
     explicit user_info();
-    explicit user_info(QString nmae, int age, double height, double weight);
+    explicit user_info(QString nmae, int age, float height, float weight);
 
     QString name;       // 名字
     int age;            // 年龄

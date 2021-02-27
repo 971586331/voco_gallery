@@ -11,6 +11,31 @@
 #include "user_info.h"
 #include <QTimer>
 
+//传感器数据包
+#pragma pack(push)  //保存对齐状态
+#pragma pack(2)     //设定为1字节对齐
+struct sensor_data_t
+{
+    unsigned int time;
+    unsigned short vo2;
+    unsigned short br;
+    float o2;
+    float tvl;
+    float tcb;
+    float flow;
+    float ve;
+    float co2;
+    float vco2;
+    float rer;
+    float eto2;
+    float etco2;
+    float pressure;
+    unsigned short temp;
+    unsigned short rh;
+};
+#pragma pack(pop)   //恢复对齐状态
+
+
 #define UUID_1900   "BBD71900-3F8A-4CCE-BD68-2C3827C286FF"
 #define UUID_1901   "BBD71901-3F8A-4CCE-BD68-2C3827C286FF"
 #define UUID_1902   "BBD71902-3F8A-4CCE-BD68-2C3827C286FF"
@@ -39,6 +64,8 @@ class Bluetooth : public QObject
     Q_PROPERTY(QVariant devices READ get_devices_list NOTIFY devicesChanged)
     Q_PROPERTY(QVariant k50_state_1 READ get_k50_state_1 NOTIFY k50_stateChanged)
     Q_PROPERTY(QVariant k50_state_2 READ get_k50_state_2 NOTIFY k50_stateChanged)
+    Q_PROPERTY(QVariant warm_up_remaining_time READ get_warm_up_remaining_time NOTIFY k50_stateChanged)
+    Q_PROPERTY(QVariantMap sensor_data READ get_sensor_data NOTIFY sensor_dataChanged)
 
 public:
     Bluetooth(QObject *object, user_info ** info);
@@ -52,15 +79,21 @@ public:
     bool device_is_exist(QList<QObject*> &devices, const QBluetoothDeviceInfo &info);
     QVariant get_k50_state_1();
     QVariant get_k50_state_2();
+    QVariant get_warm_up_remaining_time();
+     QVariantMap get_sensor_data();
     Q_INVOKABLE void calibration_1_callback();
     Q_INVOKABLE void calibration_2_callback();
     Q_INVOKABLE void calibration_3_callback();
     Q_INVOKABLE void calibration_4_callback();
+    Q_INVOKABLE void start_data_collection();
+    Q_INVOKABLE void stop_data_collection();
 
     QString wb_name;
     QList<QObject*> m_devices;
     quint8 m_k50_state_1;
     quint8 m_k50_state_2;
+    quint16 m_warm_up_remaining_time = 0;
+    QVariantMap sensor_data_map;
 
     user_info **active_user = nullptr;
     QObject *g_rootObject;
@@ -109,6 +142,7 @@ public:
 signals:
     void devicesChanged();
     void k50_stateChanged();
+    void sensor_dataChanged();
 
 private slots:
     void addBlueToothDevicesToList(const QBluetoothDeviceInfo &info);

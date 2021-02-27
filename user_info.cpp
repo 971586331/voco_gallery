@@ -6,7 +6,7 @@ user_info::user_info()
 
 }
 
-user_info::user_info(QString nmae, int age, double height, double weight) :
+user_info::user_info(QString nmae, int age, float height, float weight) :
     name(nmae), age(age), height(height), weight(weight)
 {
 }
