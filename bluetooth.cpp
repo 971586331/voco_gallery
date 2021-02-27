@@ -177,8 +177,8 @@ void Bluetooth::ble_connect_device(QBluetoothDeviceInfo info)
     connect(m_control, &QLowEnergyController::connected, this, [this]()
     {
         qDebug("控制器连接.搜索服务……");
-        g_rootObject->setProperty("scan_state", QString("已经连接到:").append(currentDeviceInfo.name()));
-        g_rootObject->setProperty("connect_status", QString("已经连接到:").append(currentDeviceInfo.name()));
+        g_rootObject->setProperty("scan_state", QString("已经连接到VOCO:").append(currentDeviceInfo.name()));
+        g_rootObject->setProperty("connect_status", QString("已经连接到VOCO:").append(currentDeviceInfo.name()));
         g_rootObject->setProperty("led_color", "green");
         m_control->discoverServices();
     });
@@ -187,7 +187,7 @@ void Bluetooth::ble_connect_device(QBluetoothDeviceInfo info)
     {
         qDebug("LowEnergy控制器断开连接");
         g_rootObject->setProperty("scan_state", tr("连接断开，请点击按钮开始寻找设备并连接！"));
-        g_rootObject->setProperty("connect_status", tr("未连接设备"));
+        g_rootObject->setProperty("connect_status", tr("未连接VOCO设备"));
         g_rootObject->setProperty("led_color", "black");
     });
 
@@ -444,13 +444,13 @@ void Bluetooth::slot_1a00_serviceStateChanged(QLowEnergyService::ServiceState s)
             }
             // 发送体重
             QByteArray array_1a02;
-            array_1a02.resize(sizeof(float));
+            array_1a02.resize(4);
             float value_1a02 = (*active_user)->getWeight();
-            memcpy(array_1a02.data(), &value_1a02, sizeof(float));
+            memcpy(array_1a02.data(), &value_1a02, 4);
             QByteArray array_1a02_2;
-            array_1a02_2.resize(sizeof(float));
-            for(int i=0; i<sizeof(float); i++)
-                array_1a02_2[i] = array_1a02[sizeof(float)-i-1];
+            array_1a02_2.resize(4);
+            for(int i=0; i<4; i++)
+                array_1a02_2[i] = array_1a02[4-i-1];
             qDebug() << "array_1a02_2 = " << array_1a02;
             m_service_1a00->writeCharacteristic(Char_1a02, array_1a02_2, QLowEnergyService::WriteWithResponse);
 
