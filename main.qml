@@ -94,7 +94,8 @@ ApplicationWindow {
             {
             case 0x00: device_state = "离线状态"; enter_monitor_button.enabled = false; break;
             case 0x01: device_state = "初始状态"; break;
-            case 0x02: device_state = "预热中，剩余 " + buletooth.warm_up_remaining_time + " 分钟"; break;
+            case 0x02: device_state = "预热中，剩余 " + buletooth.warm_up_remaining_time + " 分钟";
+                buletooth.send_weight_timestamp(); break;
             case 0x03: device_state = "预热完成，但没收到体重数据和时间戳"; break;
             case 0x04: device_state = "准备就绪"; enter_monitor_button.enabled = true; break;
             case 0x05: device_state = "正在接收传感器数据包"; break;
@@ -173,7 +174,7 @@ ApplicationWindow {
 
         onSensor_dataChanged:
         {
-            console.log("onSensor_dataChanged")
+//            console.log("onSensor_dataChanged")
             sensor_data_qml = buletooth.sensor_data
         }
     }

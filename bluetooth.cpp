@@ -486,7 +486,6 @@ void Bluetooth::slot_1a00_serviceStateChanged(QLowEnergyService::ServiceState s)
             array_1a02_2.resize(4);
             for(int i=0; i<4; i++)
                 array_1a02_2[i] = array_1a02[4-i-1];
-            qDebug() << "array_1a02_2 = " << array_1a02;
             m_service_1a00->writeCharacteristic(Char_1a02, array_1a02_2, QLowEnergyService::WriteWithResponse);
 
             Char_1a03 = m_service_1a00->characteristic(QBluetoothUuid(QString(UUID_1A03)));
@@ -827,4 +826,29 @@ void Bluetooth::stop_data_collection()
     ch.resize(1);
     ch[0] = 0;
     m_service_1a00->writeCharacteristic(Char_1a08, ch, QLowEnergyService::WriteWithResponse);
+}
+
+/**
+ * @brief Bluetooth::send_weight_timestamp  发送体重和时间戳
+ */
+void Bluetooth::send_weight_timestamp()
+{
+    // 发送体重
+    QByteArray array_1a02;
+    array_1a02.resize(4);
+    float value_1a02 = (*active_user)->getWeight();
+    memcpy(array_1a02.data(), &value_1a02, 4);
+    QByteArray array_1a02_2;
+    array_1a02_2.resize(4);
+    for(int i=0; i<4; i++)
+        array_1a02_2[i] = array_1a02[4-i-1];
+    m_service_1a00->writeCharacteristic(Char_1a02, array_1a02_2, QLowEnergyService::WriteWithResponse);
+
+    // 发送时间戳
+    QByteArray array_1a03;
+    array_1a03.resize(sizeof(int));
+    QDateTime time = QDateTime::currentDateTime();   //获取当前时间
+    int value_1a03 = time.toTime_t();
+    memcpy(array_1a03.data(), &value_1a03, sizeof(float));
+    m_service_1a00->writeCharacteristic(Char_1a03, array_1a03, QLowEnergyService::WriteWithResponse);
 }

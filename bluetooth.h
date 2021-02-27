@@ -80,7 +80,8 @@ public:
     QVariant get_k50_state_1();
     QVariant get_k50_state_2();
     QVariant get_warm_up_remaining_time();
-     QVariantMap get_sensor_data();
+    QVariantMap get_sensor_data();
+    Q_INVOKABLE void send_weight_timestamp();
     Q_INVOKABLE void calibration_1_callback();
     Q_INVOKABLE void calibration_2_callback();
     Q_INVOKABLE void calibration_3_callback();
