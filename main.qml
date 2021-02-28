@@ -73,6 +73,8 @@ ApplicationWindow {
     property string current_user_name : qsTr("未选择")
     property string current_wristband_addr : ""
     property string device_state : "离线状态"
+    property bool wb_is_connect : false
+    property string heart_rate
 
     property bool calibration_busy1
     property bool calibration_busy2
@@ -524,17 +526,45 @@ ApplicationWindow {
                 text: window.wb_connect_status + wb_name
                 font.pixelSize: 16
             }
+            Image {
+                id: heart
+                width: parent.width * 0.5
+                height: parent.height * 0.3
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                source: "images/heart.png"
+                smooth: true
+                antialiasing: true
+                fillMode: Image.Stretch
+
+                SequentialAnimation{
+                    id: heartAnim
+                    running: wb_is_connect
+                    loops: Animation.Infinite
+                    alwaysRunToEnd: true
+                    PropertyAnimation { target: heart; property: "scale"; to: 1.2; duration: 500; easing.type: Easing.InQuad }
+                    PropertyAnimation { target: heart; property: "scale"; to: 1.0; duration: 500; easing.type: Easing.OutQuad }
+                }
+            }
+            Label {
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                text: "心率：" + heart_rate
+                font.pixelSize: 16
+                visible: wb_is_connect
+            }
             Label {
                 id: label_device_state
-                anchors.top: wb_connect_status_label.bottom
-                anchors.topMargin: 20
+                anchors.bottom: label_device_state1.top
+                anchors.bottomMargin: 20
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: "设备工作状态："
                 font.pixelSize: 16
             }
             Label {
-                anchors.top: label_device_state.bottom
-                anchors.topMargin: 20
+                id: label_device_state1
+                anchors.bottom: enter_monitor_button.top
+                anchors.bottomMargin: 20
                 anchors.horizontalCenter: parent.horizontalCenter
                 text: device_state
                 font.pixelSize: 16

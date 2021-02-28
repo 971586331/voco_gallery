@@ -344,8 +344,10 @@ void Bluetooth::slot_hr_updateHeartRateValue(const QLowEnergyCharacteristic &c, 
         hrvalue = static_cast<int>(data[1]);
 
     qDebug("心率 = %d", hrvalue);
+    g_rootObject->setProperty("heart_rate", QString::number(hrvalue));
 
     wb_state_time->start(5*1000);
+    g_rootObject->setProperty("wb_is_connect", true);
     g_rootObject->setProperty("wb_connect_status", tr("已连接到手环："));
     g_rootObject->setProperty("wb_name", wb_name);
     g_rootObject->setProperty("wb_led_color", "green");
@@ -356,6 +358,7 @@ void Bluetooth::slot_hr_updateHeartRateValue(const QLowEnergyCharacteristic &c, 
  */
 void Bluetooth::on_wb_state_time_timeout()
 {
+    g_rootObject->setProperty("wb_is_connect", false);
     g_rootObject->setProperty("wb_connect_status", tr("未连接手环"));
     g_rootObject->setProperty("wb_name", "");
     g_rootObject->setProperty("wb_led_color", "black");

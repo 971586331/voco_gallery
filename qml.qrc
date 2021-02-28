@@ -65,5 +65,6 @@
         <file>mypages/wristband.qml</file>
         <file>mypages/calibration.qml</file>
         <file>mypages/ConfirmDialog.qml</file>
+        <file>images/heart.png</file>
     </qresource>
 </RCC>
