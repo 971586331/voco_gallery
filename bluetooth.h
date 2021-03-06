@@ -91,13 +91,13 @@ public:
 
     QString wb_name;
     QList<QObject*> m_devices;
-    quint8 m_k50_state_1;
-    quint8 m_k50_state_2;
+    quint8 m_k50_state_1 = 0x00;
+    quint8 m_k50_state_2 = 0x00;
     quint16 m_warm_up_remaining_time = 0;
     QVariantMap sensor_data_map;
 
     user_info **active_user = nullptr;
-    QObject *g_rootObject;
+    QObject *g_rootObject = nullptr;
     QBluetoothDeviceInfo currentDeviceInfo;
     void ble_connect_device(QBluetoothDeviceInfo info);
 

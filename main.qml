@@ -107,69 +107,33 @@ ApplicationWindow {
 
             switch(buletooth.k50_state_2 & 0x03)
             {
-            case 0x00:
-                calibration_lable1 = qsTr("未校准")
-                calibration_busy1 = false
-                break;
-            case 0x01:
-                calibration_lable1 = qsTr("正在校准")
-                calibration_busy1 = true
-                break;
-            case 0x02:
-                calibration_lable1 = qsTr("校准完成")
-                calibration_busy1 = false
-                break;
+            case 0x00:calibration_lable1 = qsTr("未校准");calibration_busy1 = false;break;
+            case 0x01:calibration_lable1 = qsTr("正在校准");calibration_busy1 = true;break;
+            case 0x02:calibration_lable1 = qsTr("校准完成");calibration_busy1 = false;break;
             default:break;
             }
 
             switch((buletooth.k50_state_2 >> 2) & 0x03)
             {
-            case 0x00:
-                calibration_lable2 = qsTr("未校准")
-                calibration_busy2 = false
-                break;
-            case 0x01:
-                calibration_lable2 = qsTr("正在校准")
-                calibration_busy2 = true
-                break;
-            case 0x02:
-                calibration_lable2 = qsTr("校准完成")
-                calibration_busy2 = false
-                break;
+            case 0x00:calibration_lable2 = qsTr("未校准");calibration_busy2 = false;break;
+            case 0x01:;calibration_lable2 = qsTr("正在校准");calibration_busy2 = true;break;
+            case 0x02:calibration_lable2 = qsTr("校准完成");calibration_busy2 = false;break;
             default:break;
             }
 
             switch((buletooth.k50_state_2 >> 4) & 0x03)
             {
-            case 0x00:
-                calibration_lable3 = qsTr("未校准")
-                calibration_busy3 = false
-                break;
-            case 0x01:
-                calibration_lable3 = qsTr("正在校准")
-                calibration_busy3 = true
-                break;
-            case 0x02:
-                calibration_lable3 = qsTr("校准完成")
-                calibration_busy3 = false
-                break;
+            case 0x00:calibration_lable3 = qsTr("未校准");calibration_busy3 = false;break;
+            case 0x01:calibration_lable3 = qsTr("正在校准");calibration_busy3 = true;break;
+            case 0x02:calibration_lable3 = qsTr("校准完成");calibration_busy3 = false;break;
             default:break;
             }
 
             switch((buletooth.k50_state_2 >> 6) & 0x03)
             {
-            case 0x00:
-                calibration_lable4 = qsTr("未校准")
-                calibration_busy4 = false
-                break;
-            case 0x01:
-                calibration_lable4 = qsTr("正在校准")
-                calibration_busy4 = true
-                break;
-            case 0x02:
-                calibration_lable4 = qsTr("校准完成")
-                calibration_busy4 = false
-                break;
+            case 0x00:calibration_lable4 = qsTr("未校准");calibration_busy4 = false;break;
+            case 0x01:calibration_lable4 = qsTr("正在校准");calibration_busy4 = true;break;
+            case 0x02:calibration_lable4 = qsTr("校准完成");calibration_busy4 = false;break;
             default:break;
             }
         }
@@ -368,120 +332,96 @@ ApplicationWindow {
             id: mian_pane2
             anchors.fill: parent
 
-             GridLayout {
-                 id: sensor_data_grid
-                 anchors.top: parent.top
-                 anchors.topMargin: 10
-                 x: 20
-                 width: parent.width - 40
-                 rowSpacing: 5
-                 columns: 2
-                 rows: 16
-                 Label {
-                     text: qsTr("Timestamp:")
-                 }
-                 Label {
-                    text: sensor_data_qml.time
-                 }
-                 Label {
-                     text: qsTr("VO2 in ml/min/kg:")
-                 }
-                 Label {
-                    text: sensor_data_qml.vo2
-                 }
-                 Label {
-                     text: qsTr("Breath Rate in breaths/minute:")
-                 }
-                 Label {
-                    text: sensor_data_qml.br
-                 }
-                 Label {
-                     text: qsTr("O2%:")
-                 }
-                 Label {
-                    text: sensor_data_qml.o2
-                 }
-                 Label {
-                     text: qsTr("Tidal Volume in Litre:")
-                 }
-                 Label {
-                    text: sensor_data_qml.tvl
-                 }
-                 Label {
-                     text: qsTr("Total Calories Burned:")
-                 }
-                 Label {
-                    text: sensor_data_qml.tcb
-                 }
-                 Label {
-                     text: qsTr("Flow in L/s:")
-                 }
-                 Label {
-                    text: sensor_data_qml.flow
-                 }
-                 Label {
-                     text: qsTr("VE in L/min:")
-                 }
-                 Label {
-                    text: sensor_data_qml.ve
-                 }
-                 Label {
-                     text: qsTr("CO2%:")
-                 }
-                 Label {
-                    text: sensor_data_qml.co2
-                 }
-                 Label {
-                     text: qsTr("VCO2 in ml/min:")
-                 }
-                 Label {
-                    text: sensor_data_qml.vco2
-                 }
-                 Label {
-                     text: qsTr("RER:")
-                 }
-                 Label {
-                    text: sensor_data_qml.rer
-                 }
-                 Label {
-                     text: qsTr("ETO2 in %:")
-                 }
-                 Label {
-                    text: sensor_data_qml.eto2
-                 }
-                 Label {
-                     text: qsTr("ETCO2 in %::")
-                 }
-                 Label {
-                    text: sensor_data_qml.etco2
-                 }
-                 Label {
-                     text: qsTr("Pressure in kPa:")
-                 }
-                 Label {
-                    text: sensor_data_qml.pressure
-                 }
-                 Label {
-                     text: qsTr("Temperature in °C:")
-                 }
-                 Label {
-                    text: sensor_data_qml.temp
-                 }
-                 Label {
-                     text: qsTr("RH in %:")
-                 }
-                 Label {
-                    text: sensor_data_qml.rh
-                 }
-             }
+            TabBar {
+                id: tabBar
+                anchors.top: parent.top
+                width: parent.width
+                height: parent.height/10
+                currentIndex: view.currentIndex
+
+                TabButton {text: qsTr("数值")}
+                TabButton {text: qsTr("图表")}
+                TabButton {text: qsTr("表盘")}
+            }
+
+            SwipeView {
+                id: view
+                currentIndex: tabBar.currentIndex
+                anchors.top: tabBar.bottom
+                width: parent.width
+                height: parent.height/10*8
+
+                Pane {
+                    width: view.width
+                    height: view.height
+
+                    GridLayout {
+                        id: sensor_data_grid
+                        anchors.top: parent.top
+                        anchors.topMargin: 10
+                        x: 20
+                        width: parent.width - 40
+                        rowSpacing: 5
+                        columns: 2
+                        rows: 16
+                        Label {text: qsTr("Timestamp:")}
+                        Label {text: sensor_data_qml.time}
+                        Label {text: qsTr("VO2 in ml/min/kg:")}
+                        Label {text: sensor_data_qml.vo2}
+                        Label {text: qsTr("Breath Rate in breaths/minute:")}
+                        Label {text: sensor_data_qml.br}
+                        Label {text: qsTr("O2%:")}
+                        Label {text: sensor_data_qml.o2}
+                        Label {text: qsTr("Tidal Volume in Litre:")}
+                        Label {text: sensor_data_qml.tvl}
+                        Label {text: qsTr("Total Calories Burned:")}
+                        Label {text: sensor_data_qml.tcb}
+                        Label {text: qsTr("Flow in L/s:")}
+                        Label {text: sensor_data_qml.flow}
+                        Label {text: qsTr("VE in L/min:")}
+                        Label {text: sensor_data_qml.ve}
+                        Label {text: qsTr("CO2%:")}
+                        Label {text: sensor_data_qml.co2}
+                        Label {text: qsTr("VCO2 in ml/min:")}
+                        Label {text: sensor_data_qml.vco2}
+                        Label {text: qsTr("RER:")}
+                        Label {text: sensor_data_qml.rer}
+                        Label {text: qsTr("ETO2 in %:")}
+                        Label {text: sensor_data_qml.eto2}
+                        Label {text: qsTr("ETCO2 in %::")}
+                        Label {text: sensor_data_qml.etco2}
+                        Label {text: qsTr("Pressure in kPa:")}
+                        Label {text: sensor_data_qml.pressure}
+                        Label {text: qsTr("Temperature in °C:")}
+                        Label {text: sensor_data_qml.temp}
+                        Label {text: qsTr("RH in %:")}
+                        Label {text: sensor_data_qml.rh}
+                    }
+                }
+                Pane {
+                    width: view.width
+                    height: view.height
+
+                    Label {
+                       text: qsTr("2")
+                    }
+                }
+                Pane {
+                    width: view.width
+                    height: view.height
+
+                    Label {
+                       text: qsTr("3")
+                    }
+                }
+            }
             Button
             {
                 id : quit_monitor_button
                 text: "退出监控"
                 anchors.bottom:  parent.bottom
-                anchors.bottomMargin: 20
+                anchors.bottomMargin: 10
                 anchors.horizontalCenter: parent.horizontalCenter
-
                 onClicked:
                 {
                     confirmDialog.open();
@@ -572,31 +512,20 @@ ApplicationWindow {
             Button
             {
                 id : enter_monitor_button
-                enabled: false
+//                enabled: false
                 text: "进入监控"
                 anchors.bottom:  parent.bottom
                 anchors.bottomMargin: 20
                 anchors.horizontalCenter: parent.horizontalCenter
                 onClicked:
                 {
-                    if( buletooth.k50_state_1 !== 0x05 )
+                    if( (buletooth.k50_state_1 !== 0x05) && (buletooth.k50_state_1 !== 0x00) )
                     {
                         buletooth.start_data_collection()
                     }
                     stackView.push(mian_pane2)
                 }
             }
-//            Button
-//            {
-//                text: "test"
-//                anchors.bottom:  parent.bottom
-//                anchors.bottomMargin: 20
-//                anchors.left: parent.left
-//                onClicked:
-//                {
-////                    mainwindow.button_test()
-//                }
-//            }
         }
     }
 
