@@ -14,7 +14,10 @@ mainwindow::mainwindow(QObject *parent) : QObject(parent)
     if (!style.isEmpty())
         sys_settings->setValue("style", style);
     else
+    {
+        sys_settings->setValue("style", "Material");
         QQuickStyle::setStyle(sys_settings->value("style").toString());
+    }
 
     g_qmlEngine = new QQmlApplicationEngine(this);
     g_qmlEngine->rootContext()->setContextProperty("availableStyles", QQuickStyle::availableStyles());

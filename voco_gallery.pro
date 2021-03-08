@@ -2,6 +2,8 @@ QT += quick quickcontrols2 bluetooth charts
 
 CONFIG += c++11
 
+RC_ICONS = app3232.ico
+
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Refer to the documentation for the
@@ -44,5 +46,14 @@ HEADERS += \
     mainwindow.h \
     user_info.h
 
-DISTFILES +=
+DISTFILES += \
+    android/AndroidManifest.xml \
+    android/build.gradle \
+    android/gradle/wrapper/gradle-wrapper.jar \
+    android/gradle/wrapper/gradle-wrapper.properties \
+    android/gradlew \
+    android/gradlew.bat \
+    android/res/values/libs.xml
+
+ANDROID_PACKAGE_SOURCE_DIR = $$PWD/android
 
