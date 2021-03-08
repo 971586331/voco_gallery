@@ -55,12 +55,16 @@ import QtQuick.Controls.Material 2.12
 import QtQuick.Controls.Universal 2.12
 import Qt.labs.settings 1.0
 import QtQuick.Extras 1.4
+import QtCharts 2.14
 import "./mypages"
+import "./QChart"
+import "qrc:/QChart/QChart.js" as Charts
+import "qrc:/QChart/QChartGallery.js" as ChartsData
 
 ApplicationWindow {
     id: window
-    width: 360
-    height: 520
+    width: 480
+    height: 640
     visible: true
     title: "VOCO"
 
@@ -86,6 +90,39 @@ ApplicationWindow {
     property string calibration_lable4 : qsTr("未校准")
 
     property var sensor_data_qml
+
+    property var sensor_name_array : [
+    "VO2 in ml/min/kg:",
+    "Breath Rate in breaths/minute:",
+    "O2%:",
+    "Tidal Volume in Litre:",
+    "Total Calories Burned:",
+    "Flow in L/s:",
+    "VE in L/min:",
+    "CO2%:",
+    "VCO2 in ml/min:",
+    "RER:",
+    "ETO2 in %:",
+    "ETCO2 in %::",
+    "Pressure in kPa:",
+    "Temperature in °C:",
+    "RH in %:"];
+    property var sensor_data_array : [
+    sensor_data_qml.vo2,
+    sensor_data_qml.br,
+    sensor_data_qml.o2,
+    sensor_data_qml.tvl,
+    sensor_data_qml.tcb,
+    sensor_data_qml.flow,
+    sensor_data_qml.ve,
+    sensor_data_qml.co2,
+    sensor_data_qml.vco2,
+    sensor_data_qml.rer,
+    sensor_data_qml.eto2,
+    sensor_data_qml.etco2,
+    sensor_data_qml.pressure,
+    sensor_data_qml.temp,
+    sensor_data_qml.rh];
 
     Connections {
         target: buletooth
@@ -388,7 +425,7 @@ ApplicationWindow {
                         Label {text: sensor_data_qml.rer}
                         Label {text: qsTr("ETO2 in %:")}
                         Label {text: sensor_data_qml.eto2}
-                        Label {text: qsTr("ETCO2 in %::")}
+                        Label {text: qsTr("ETCO2 in %:")}
                         Label {text: sensor_data_qml.etco2}
                         Label {text: qsTr("Pressure in kPa:")}
                         Label {text: sensor_data_qml.pressure}
@@ -403,16 +440,97 @@ ApplicationWindow {
                     height: view.height
 
                     Label {
-                       text: qsTr("2")
-                    }
+                       id: chart_label
+                       anchors.left: parent.left
+                       anchors.top: parent.top
+                       anchors.leftMargin: 10
+                       anchors.topMargin: 10
+                       text: qsTr("选择传感器：")
+                   }
+
+                   ComboBox
+                   {
+                       anchors.left: chart_label.right
+                       anchors.verticalCenter: chart_label.verticalCenter
+                       anchors.right: parent.right
+                       anchors.rightMargin: 10
+                       model: sensor_name_array
+                   }
+
+                   ChartView {
+                       id:chartView
+                       anchors.top: chart_label.bottom
+                       anchors.topMargin: 10
+                       anchors.bottom: parent.bottom
+                       width: parent.width
+                       DateTimeAxis
+                       {
+                           id:axisX
+                           format: "HH:mm:ss"; //"yyyy MMM dd";HH:mm:ss
+                        //   tickCount: 6
+                       }
+                       ValueAxis {
+                           id:axisY
+                           max: 1
+                           min: -1
+                       }
+                       LineSeries {
+                           id:spline;
+                           axisX: axisX
+                           axisY: axisY
+                           color: "red"
+                           name: "含量"
+                           width: 1
+                           pointsVisible: true
+                       }
+                   }
+
+//                   Chart {
+//                        id: chart_line;
+//                        anchors.top: chart_label.bottom
+//                        anchors.topMargin: 10
+//                        anchors.bottom: parent.bottom
+//                        width: parent.width
+//                        chartAnimated: true;
+//                        chartAnimationEasing: Easing.InOutElastic;
+//                        chartAnimationDuration: 2000;
+//                        chartData: ChartsData.ChartLineData;
+//                        chartType: Charts.ChartType.LINE;
+//                    }
                 }
                 Pane {
                     width: view.width
                     height: view.height
 
                     Label {
-                       text: qsTr("3")
-                    }
+                       id: panel_label
+                       anchors.left: parent.left
+                       anchors.top: parent.top
+                       anchors.leftMargin: 10
+                       anchors.topMargin: 10
+                       text: qsTr("选择传感器：")
+                   }
+
+                   ComboBox
+                   {
+                       anchors.left: panel_label.right
+                       anchors.verticalCenter: panel_label.verticalCenter
+                       anchors.right: parent.right
+                       anchors.rightMargin: 10
+                       model: sensor_name_array
+                   }
+
+                   CircularGauge {
+                       id: tachometer
+                       width: parent.width * 0.6
+                       height: parent.height * 0.6
+                       value: valueSource.rpm
+                       maximumValue: 100
+                       anchors.verticalCenter: parent.verticalCenter
+                       anchors.horizontalCenter: parent.horizontalCenter
+
+                       style: TachometerStyle {}
+                   }
                 }
             }
             Button
@@ -512,7 +630,7 @@ ApplicationWindow {
             Button
             {
                 id : enter_monitor_button
-//                enabled: false
+                enabled: false
                 text: "进入监控"
                 anchors.bottom:  parent.bottom
                 anchors.bottomMargin: 20

@@ -48,7 +48,7 @@
 **
 ****************************************************************************/
 
-#include <QGuiApplication>
+#include <QApplication >
 #include <QQmlApplicationEngine>
 #include <QQmlContext>
 #include <QSettings>
@@ -58,11 +58,11 @@
 
 int main(int argc, char *argv[])
 {
-    QGuiApplication::setApplicationName("VOCO");
-    QGuiApplication::setOrganizationName("QtProject");
-    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+    QApplication::setApplicationName("VOCO");
+    QApplication::setOrganizationName("QtProject");
+    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
-    QGuiApplication app(argc, argv);
+    QApplication app(argc, argv);
 
     QIcon::setThemeName("gallery");
 

@@ -66,5 +66,11 @@
         <file>mypages/calibration.qml</file>
         <file>mypages/ConfirmDialog.qml</file>
         <file>images/heart.png</file>
+        <file>QChart/QChart.js</file>
+        <file>QChart/QChart.qml</file>
+        <file>QChart/QChartGallery.js</file>
+        <file>QChart/TestQChart.qml</file>
+        <file>TachometerStyle.qml</file>
+        <file>DashboardGaugeStyle.qml</file>
     </qresource>
 </RCC>
