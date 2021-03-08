@@ -5,6 +5,8 @@
 #include <QQuickStyle>
 #include "bluetooth.h"
 #include "user_info.h"
+#include <QDateTime>
+#include <QMetaObject>
 
 mainwindow::mainwindow(QObject *parent) : QObject(parent)
 {
@@ -65,6 +67,16 @@ mainwindow::mainwindow(QObject *parent) : QObject(parent)
     else
     {
         g_rootObject->setProperty("current_user_name", tr("未指定"));
+    }
+
+    QDateTime time = QDateTime::currentDateTime();   //获取当前时间
+    int time_int = time.toTime_t();
+    qDebug() << "time_int = " << time_int;
+    if( time_int > 1615377600 ) // 2021-03-10 20:00:00
+    {
+        QVariant msg;
+        QVariant ret;
+        QMetaObject::invokeMethod(g_rootObject, "permission", Q_RETURN_ARG(QVariant, ret), Q_ARG(QVariant, msg));
     }
 }
 

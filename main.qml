@@ -182,6 +182,25 @@ ApplicationWindow {
         }
     }
 
+    ConfirmDialog
+    {
+        id: permissionDialog
+        i_title: "错误"
+        i_message: "程序已过期，请安装新版本！"
+        standardButtons: Dialog.Ok
+        onAccepted:
+        {
+//            console.log("App is not authorized~~~~~~~~~~~~~~~")
+            Qt.quit()
+        }
+    }
+
+    function permission(msg)
+    {
+        permissionDialog.open()
+        return "value"
+    }
+
     Settings {
         id: settings
 //        property string style: "Default"
