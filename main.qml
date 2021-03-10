@@ -748,6 +748,13 @@ ApplicationWindow {
                 wrapMode: Label.Wrap
                 font.pixelSize: 12
             }
+
+            Label {
+                width: aboutDialog.availableWidth
+                text: "应用过期时间：" + "2021-03-31 12:00:00"
+                wrapMode: Label.Wrap
+                font.pixelSize: 12
+            }
         }
     }
 }

@@ -71,8 +71,7 @@ mainwindow::mainwindow(QObject *parent) : QObject(parent)
 
     QDateTime time = QDateTime::currentDateTime();   //获取当前时间
     int time_int = time.toTime_t();
-    qDebug() << "time_int = " << time_int;
-    if( time_int > 1615377600 ) // 2021-03-10 20:00:00
+    if( time_int > 1617163200 ) // 2021-03-31 12:00:00
     {
         QVariant msg;
         QVariant ret;
