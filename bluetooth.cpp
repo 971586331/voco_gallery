@@ -757,6 +757,9 @@ void Bluetooth::calibration_1_callback()
     if( (m_k50_state_2 & 0x03) == 0x01 )
         return;
 
+    if (!Char_1a04.isValid())
+        return;
+
     QByteArray ch;
     ch.resize(1);
     ch[0] = 1;
@@ -769,6 +772,9 @@ void Bluetooth::calibration_1_callback()
 void Bluetooth::calibration_2_callback()
 {
     if( ((m_k50_state_2 >> 2) & 0x03) == 0x01 )
+        return;
+
+    if (!Char_1a05.isValid())
         return;
 
     QByteArray ch;
@@ -785,6 +791,9 @@ void Bluetooth::calibration_3_callback()
     if( ((m_k50_state_2 >> 4) & 0x03) == 0x01 )
         return;
 
+    if (!Char_1a06.isValid())
+        return;
+
     QByteArray ch;
     ch.resize(1);
     ch[0] = 1;
@@ -797,6 +806,9 @@ void Bluetooth::calibration_3_callback()
 void Bluetooth::calibration_4_callback()
 {
     if( ((m_k50_state_2 >> 6) & 0x03) == 0x01 )
+        return;
+
+    if (!Char_1a07.isValid())
         return;
 
     QByteArray ch;
