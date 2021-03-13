@@ -7,7 +7,7 @@ Dialog {
     property string i_message : "消息"
 
     x: parent.width / 2 - width / 2
-    y: parent.height / 10
+    y: parent.height / 5
 
     focus: true
     modal: true

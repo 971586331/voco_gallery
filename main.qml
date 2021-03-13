@@ -195,6 +195,23 @@ ApplicationWindow {
         }
     }
 
+    ConfirmDialog
+    {
+        id: open_bt
+        i_title: "提示"
+        i_message: "蓝牙未开启，正在自动开启蓝牙...\n请重新点击开始扫描\n\n(有些平台蓝牙可能不能自动打开，\n请手动打开蓝牙后再开始扫描)"
+        standardButtons: Dialog.Ok
+        onAccepted:
+        {
+        }
+    }
+
+    function open_bt_message(msg)
+    {
+        open_bt.open()
+        return "value"
+    }
+
     function permission(msg)
     {
         permissionDialog.open()

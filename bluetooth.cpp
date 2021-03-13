@@ -57,8 +57,19 @@ void Bluetooth::ble_start_scan()
 {
     qDebug() << "run ble_start_scan()";
     m_devices.clear();
-    discoveryAgent->start();
-    g_rootObject->setProperty("scan_state", "正在扫描...");
+
+    if(m_localDevice->hostMode()==QBluetoothLocalDevice::HostPoweredOff)
+    {
+        m_localDevice->powerOn();
+        QVariant msg;
+        QVariant ret;
+        QMetaObject::invokeMethod(g_rootObject, "open_bt_message", Q_RETURN_ARG(QVariant, ret), Q_ARG(QVariant, msg));
+    }
+    else
+    {
+        discoveryAgent->start();
+        g_rootObject->setProperty("scan_state", "正在扫描...");
+    }
 }
 
 /**
