@@ -31,16 +31,6 @@ mainwindow::mainwindow(QObject *parent) : QObject(parent)
     buletooth = new Bluetooth(g_rootObject, &active_user);
     g_qmlEngine->rootContext()->setContextProperty("buletooth", buletooth);
 
-    // 用户信息
-//    user_info_obj = new JsonHandle(":/user_info.json");
-//    QJsonArray array = user_info_obj->rootObj.value("user_info").toArray();
-//    for(int i = 0; i< array.count(); i++)
-//    {
-//        QJsonObject name_obj = array.at(i).toObject();
-//        m_user_info.append(new user_info(name_obj));
-//        emit userInfoChanged();
-//    }
-
     qRegisterMetaTypeStreamOperators<struct user_info_t >("struct user_info_t");
 
     user_info_settings = new QSettings("stuff.ini", QSettings::IniFormat);
@@ -74,9 +64,17 @@ mainwindow::mainwindow(QObject *parent) : QObject(parent)
     if( time_int > 1617163200 ) // 2021-03-31 12:00:00
     {
         QVariant msg;
-        QVariant ret;
-        QMetaObject::invokeMethod(g_rootObject, "permission", Q_RETURN_ARG(QVariant, ret), Q_ARG(QVariant, msg));
+        QMetaObject::invokeMethod(g_rootObject, "permission", Q_ARG(QVariant, msg));
     }
+
+    QString dateTime;
+    dateTime += __DATE__;
+    dateTime += __TIME__;
+    dateTime.replace("  "," 0");
+    QDateTime datatime = QLocale(QLocale::English).toDateTime(dateTime,"MMM dd yyyyhh:mm:ss");
+    QString versions_str = datatime.toString("yyyyMMddhhmm");
+    qDebug() << "versions_str = " << versions_str;
+    QMetaObject::invokeMethod(g_rootObject, "get_versions_str", Q_ARG(QVariant, versions_str));
 }
 
 /**

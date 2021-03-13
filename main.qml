@@ -68,6 +68,8 @@ ApplicationWindow {
     visible: true
     title: "VOCO"
 
+    property string versions_str : ""
+
     property string scan_state : qsTr("点击按钮开始寻找设备")
     property string connect_status : qsTr("未连接VOCO设备")
     property string wb_connect_status : qsTr("未连接手环")
@@ -216,6 +218,11 @@ ApplicationWindow {
     {
         permissionDialog.open()
         return "value"
+    }
+
+    function get_versions_str(msg)
+    {
+        versions_str = msg
     }
 
     Settings {
@@ -754,21 +761,35 @@ ApplicationWindow {
 
             Label {
                 width: aboutDialog.availableWidth
-                text: qsTr("这个应用是用作连接VOCO设备，控制设备运行，监控设备运行状态。")
+                text: qsTr("本应用是用作连接VOCO设备，控制设备运行，监控设备运行状态的专用应用，如果您不明白前面说的是啥，请删除此应用。")
                 wrapMode: Label.Wrap
                 font.pixelSize: 12
             }
 
             Label {
                 width: aboutDialog.availableWidth
-                text: "如在使用过程中有疑问，请发邮件至ｘｘｘ"
+                text: qsTr("本应用非公开发布版本，应用内的图标均来自网络，如有涉及版权问题，请联系我修改。")
                 wrapMode: Label.Wrap
                 font.pixelSize: 12
             }
 
             Label {
                 width: aboutDialog.availableWidth
-                text: "应用过期时间：" + "2021-03-31 12:00:00"
+                text: qsTr("如在使用过程中有疑问，请发邮件至971586331@qq.com")
+                wrapMode: Label.Wrap
+                font.pixelSize: 12
+            }
+
+            Label {
+                width: aboutDialog.availableWidth
+                text: qsTr("应用过期时间：" + "2021-03-31 12:00:00")
+                wrapMode: Label.Wrap
+                font.pixelSize: 12
+            }
+
+            Label {
+                width: aboutDialog.availableWidth
+                text: qsTr("应用版本：") + versions_str
                 wrapMode: Label.Wrap
                 font.pixelSize: 12
             }
