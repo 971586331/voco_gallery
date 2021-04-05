@@ -61,7 +61,7 @@ mainwindow::mainwindow(QObject *parent) : QObject(parent)
 
     QDateTime time = QDateTime::currentDateTime();   //获取当前时间
     int time_int = time.toTime_t();
-    if( time_int > 1617163200 ) // 2021-03-31 12:00:00
+    if( time_int > 1622520000 ) // 2021-06-01 12:00:00
     {
         QVariant msg;
         QMetaObject::invokeMethod(g_rootObject, "permission", Q_ARG(QVariant, msg));
@@ -75,6 +75,9 @@ mainwindow::mainwindow(QObject *parent) : QObject(parent)
     QString versions_str = datatime.toString("yyyyMMddhhmm");
     qDebug() << "versions_str = " << versions_str;
     QMetaObject::invokeMethod(g_rootObject, "get_versions_str", Q_ARG(QVariant, versions_str));
+
+    QMetaObject::invokeMethod(g_rootObject, "qml_init");
+
 }
 
 /**

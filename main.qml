@@ -93,6 +93,35 @@ ApplicationWindow {
 
     property var sensor_data_qml
 
+    property var sensor_series_array : [
+    ]
+
+    property var value_axis_min : [
+        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+    ]
+
+    property var value_axis_max : [
+        100,100,100,100,100,100,100,100,100,100,100,100,100,1000,1000
+    ]
+
+    property string sensor_color_array : [
+        "red",
+        "springgreen",
+        "teal",
+        "slateblue",
+        "seagreen",
+        "royalblue",
+        "purple",
+        "palegreen",
+        "olivedrab",
+        "midnightblue",
+        "mediumslateblue",
+        "mediumblue",
+        "lime",
+        "lightslategray",
+        "black",
+    ]
+
     property var sensor_name_array : [
     "VO2 in ml/min/kg:",
     "Breath Rate in breaths/minute:",
@@ -109,6 +138,7 @@ ApplicationWindow {
     "Pressure in kPa:",
     "Temperature in °C:",
     "RH in %:"];
+
     property var sensor_data_array : [
     sensor_data_qml.vo2,
     sensor_data_qml.br,
@@ -125,6 +155,47 @@ ApplicationWindow {
     sensor_data_qml.pressure,
     sensor_data_qml.temp,
     sensor_data_qml.rh];
+
+    property var recv_time : 0
+
+    function qml_init()
+    {
+        console.log("qml_init!!");
+
+        for(var i=0; i<sensor_name_array.length; i++)
+        {
+            var lineSeries = chartView.series(sensor_name_array[i]);
+            if (!lineSeries) {
+                lineSeries = chartView.createSeries(ChartView.SeriesTypeLine, sensor_name_array[i]);
+                sensor_series_array[i] = lineSeries;
+                if( i === comboxbox_1.currentIndex )
+                {
+                    chartView.axisY().min = value_axis_min[i];
+                    chartView.axisY().max = value_axis_max[i];
+                    chartView.axisX().min = 0;
+                    chartView.axisX().max = 100;
+                    lineSeries.visible = true;
+                }
+                else
+                    lineSeries.visible = false;
+            }
+        }
+    }
+
+    function switch_line(name)
+    {
+        for(var i=0; i<sensor_name_array.length; i++)
+        {
+            var lineSeries = chartView.series(sensor_name_array[i]);
+            if( sensor_name_array[i] === name )
+            {
+                console.log("switch_line name = " + name)
+                lineSeries.visible = true;
+            }
+            else
+                lineSeries.visible = false;
+        }
+    }
 
     Connections {
         target: buletooth
@@ -181,6 +252,24 @@ ApplicationWindow {
         {
 //            console.log("onSensor_dataChanged")
             sensor_data_qml = buletooth.sensor_data
+            recv_time ++;
+
+            sensor_series_array[0].append(recv_time, sensor_data_qml.vo2);
+            sensor_series_array[1].append(recv_time, sensor_data_qml.br);
+            sensor_series_array[2].append(recv_time, sensor_data_qml.o2);
+            sensor_series_array[3].append(recv_time, sensor_data_qml.tvl);
+            sensor_series_array[4].append(recv_time, sensor_data_qml.tcb);
+            sensor_series_array[5].append(recv_time, sensor_data_qml.flow);
+            sensor_series_array[6].append(recv_time, sensor_data_qml.ve);
+            sensor_series_array[7].append(recv_time, sensor_data_qml.co2);
+            sensor_series_array[8].append(recv_time, sensor_data_qml.vco2);
+            sensor_series_array[9].append(recv_time, sensor_data_qml.rer);
+            sensor_series_array[10].append(recv_time, sensor_data_qml.eto2);
+            sensor_series_array[11].append(recv_time, sensor_data_qml.etco2);
+            sensor_series_array[12].append(recv_time, sensor_data_qml.pressure);
+            sensor_series_array[13].append(recv_time, sensor_data_qml.temp);
+            sensor_series_array[14].append(recv_time, sensor_data_qml.rh);
+
         }
     }
 
@@ -493,11 +582,20 @@ ApplicationWindow {
 
                    ComboBox
                    {
+                       id: comboxbox_1
                        anchors.left: chart_label.right
                        anchors.verticalCenter: chart_label.verticalCenter
                        anchors.right: parent.right
                        anchors.rightMargin: 10
                        model: sensor_name_array
+                       onActivated:
+                       {
+                           chartView.axisY().min = value_axis_min[index];
+                           chartView.axisY().max = value_axis_max[index];
+                           chartView.axisX().min = 0;
+                           chartView.axisX().max = 100;
+                           switch_line(comboxbox_1.currentText);
+                       }
                    }
 
                    ChartView {
@@ -506,40 +604,30 @@ ApplicationWindow {
                        anchors.topMargin: 10
                        anchors.bottom: parent.bottom
                        width: parent.width
-                       DateTimeAxis
-                       {
-                           id:axisX
-                           format: "HH:mm:ss"; //"yyyy MMM dd";HH:mm:ss
-                        //   tickCount: 6
-                       }
-                       ValueAxis {
-                           id:axisY
-                           max: 1
-                           min: -1
-                       }
-                       LineSeries {
-                           id:spline;
-                           axisX: axisX
-                           axisY: axisY
-                           color: "red"
-                           name: "含量"
-                           width: 1
-                           pointsVisible: true
-                       }
+//                       DateTimeAxis
+//                       {
+//                           id:axisX
+//                           format: "mm:ss"; //"yyyy MMM dd";HH:mm:ss
+//                        //   tickCount: 6
+//                       }
+//                       ValueAxis {
+//                           id:axisX
+//                           max: 100
+//                           min: 0
+//                       }
+//                       ValueAxis {
+//                           id:axisY
+//                           max: 1
+//                           min: 0
+//                       }
+//                       LineSeries {
+//                           id: spline;
+//                           axisX: axisX
+//                           axisY: axisY
+//                           pointLabelsVisible: false
+//                           pointsVisible: false
+//                       }
                    }
-
-//                   Chart {
-//                        id: chart_line;
-//                        anchors.top: chart_label.bottom
-//                        anchors.topMargin: 10
-//                        anchors.bottom: parent.bottom
-//                        width: parent.width
-//                        chartAnimated: true;
-//                        chartAnimationEasing: Easing.InOutElastic;
-//                        chartAnimationDuration: 2000;
-//                        chartData: ChartsData.ChartLineData;
-//                        chartType: Charts.ChartType.LINE;
-//                    }
                 }
                 Pane {
                     width: view.width
@@ -556,6 +644,7 @@ ApplicationWindow {
 
                    ComboBox
                    {
+                       id: comboxbox_2
                        anchors.left: panel_label.right
                        anchors.verticalCenter: panel_label.verticalCenter
                        anchors.right: parent.right
@@ -683,6 +772,10 @@ ApplicationWindow {
                     if( (buletooth.k50_state_1 !== 0x05) && (buletooth.k50_state_1 !== 0x00) )
                     {
                         buletooth.start_data_collection()
+
+                        recv_time = 0;
+                        chartView.removeAllSeries();
+                        qml_init();
                     }
                     stackView.push(mian_pane2)
                 }
@@ -782,7 +875,7 @@ ApplicationWindow {
 
             Label {
                 width: aboutDialog.availableWidth
-                text: qsTr("应用过期时间：" + "2021-03-31 12:00:00")
+                text: qsTr("应用过期时间：" + "2021-06-01 12:00:00")
                 wrapMode: Label.Wrap
                 font.pixelSize: 12
             }
