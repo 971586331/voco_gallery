@@ -76,7 +76,7 @@ mainwindow::mainwindow(QObject *parent) : QObject(parent)
     qDebug() << "versions_str = " << versions_str;
     QMetaObject::invokeMethod(g_rootObject, "get_versions_str", Q_ARG(QVariant, versions_str));
 
-    QMetaObject::invokeMethod(g_rootObject, "qml_init");
+//    QMetaObject::invokeMethod(g_rootObject, "qml_init");
 
 }
 

@@ -98,22 +98,24 @@ DashboardGaugeStyle {
         Text {
             id: rpmText
             font.pixelSize: tachometerStyle.toPixels(0.3)
-            text: rpmInt
+            text: middle_int
             color: "white"
             horizontalAlignment: Text.AlignRight
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.top: parent.verticalCenter
             anchors.topMargin: 20
 
-            readonly property int rpmInt: valueSource.rpm
+            readonly property int middle_int: tachometer.value
         }
         Text {
-            text: "含量"
+            text: middle_str
             color: "white"
             font.pixelSize: tachometerStyle.toPixels(0.1)
             anchors.top: parent.top
             anchors.topMargin: parent.height / 4
             anchors.horizontalCenter: parent.horizontalCenter
+
+            readonly property string middle_str: comboxbox_2.currentText
         }
         Text {
             text: "%"

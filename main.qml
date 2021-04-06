@@ -656,8 +656,8 @@ ApplicationWindow {
                        id: tachometer
                        width: parent.width * 0.6
                        height: parent.height * 0.6
-                       value: valueSource.rpm
-                       maximumValue: 100
+                       value: sensor_data_array[comboxbox_2.currentIndex]
+                       maximumValue: value_axis_max[comboxbox_2.currentIndex]
                        anchors.verticalCenter: parent.verticalCenter
                        anchors.horizontalCenter: parent.horizontalCenter
 
