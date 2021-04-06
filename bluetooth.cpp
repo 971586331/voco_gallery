@@ -114,8 +114,11 @@ void Bluetooth::addBlueToothDevicesToList(const QBluetoothDeviceInfo &info)
         bool ret = device_is_exist(m_devices, info);
         if( ret == false )
         {
-            m_devices.append(new DeviceInfo(info));
-            emit devicesChanged();
+            if( info.name() != "" )
+            {
+                m_devices.append(new DeviceInfo(info));
+                emit devicesChanged();
+            }
         }
     }
 }
@@ -837,6 +840,25 @@ void Bluetooth::start_data_collection()
     ch.resize(1);
     ch[0] = 1;
     m_service_1a00->writeCharacteristic(Char_1a08, ch, QLowEnergyService::WriteWithResponse);
+
+    sensor_data_map.clear();
+    sensor_data_map.insert("time", "0");
+    sensor_data_map.insert("vo2", "0");
+    sensor_data_map.insert("br", "0");
+    sensor_data_map.insert("o2", "0");
+    sensor_data_map.insert("tvl", "0");
+    sensor_data_map.insert("tcb", "0");
+    sensor_data_map.insert("flow", "0");
+    sensor_data_map.insert("ve", "0");
+    sensor_data_map.insert("co2", "0");
+    sensor_data_map.insert("vco2", "0");
+    sensor_data_map.insert("rer", "0");
+    sensor_data_map.insert("eto2", "0");
+    sensor_data_map.insert("etco2", "0");
+    sensor_data_map.insert("pressure", "0");
+    sensor_data_map.insert("temp", "0");
+    sensor_data_map.insert("rh", "0");
+    emit sensor_dataChanged();
 }
 
 /**
