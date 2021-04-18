@@ -80,6 +80,11 @@ mainwindow::mainwindow(QObject *parent) : QObject(parent)
 
 }
 
+void mainwindow::button_test()
+{
+    qDebug("button_test()");
+}
+
 /**
  * @brief mainwindow::get_user_info_list
  * @return
@@ -171,14 +176,6 @@ QByteArray intToByte(int i)
     abyte0[2] = (uchar) ((0x00ff0000 & i) >> 16);
     abyte0[3] = (uchar) ((0xff000000 & i) >> 24);
     return abyte0;
-}
-
-int index = 9;
-void mainwindow::button_test()
-{
-    qDebug("button_test()");
-    QByteArray ch = intToByte(index);
-    buletooth->m_service_1a00->writeCharacteristic(buletooth->Char_1a03, ch, QLowEnergyService::WriteWithResponse);
 }
 
 void mainwindow::set_wristband_addr(QString addr)

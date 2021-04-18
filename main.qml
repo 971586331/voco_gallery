@@ -780,6 +780,18 @@ ApplicationWindow {
                     stackView.push(mian_pane2)
                 }
             }
+
+            Button
+            {
+                id : test_button
+                text: "测试"
+                anchors.left:  parent.left
+                anchors.verticalCenter: enter_monitor_button.verticalCenter
+                onClicked:
+                {
+                    mainwindow.button_test();
+                }
+            }
         }
     }
 
