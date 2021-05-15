@@ -7,6 +7,10 @@
 #include "user_info.h"
 #include <QDateTime>
 #include <QMetaObject>
+#include <QtNetwork/QNetworkRequest>
+#include <QtNetwork/QNetworkReply>
+#include <QtCore/QJsonObject>
+#include <QEventLoop>
 
 mainwindow::mainwindow(QObject *parent) : QObject(parent)
 {
@@ -80,9 +84,62 @@ mainwindow::mainwindow(QObject *parent) : QObject(parent)
 
 }
 
+int mainwindow::SendAndGetText(QString strUrl, QString thod, QString strInput, QString &strMessage,QString &strResult)
+{
+
+    QNetworkRequest oNetRequest;
+    oNetRequest.setUrl(QUrl(strUrl));
+    oNetRequest.setRawHeader("Content-Type", "application/octet-stream");
+    //oNetRequest.setRawHeader("Content-Type", "application/json");
+    //oNetRequest.setRawHeader("Content-Type", "application/xml");
+    //oNetRequest.setRawHeader("Content-Type", "application/octet-stream");
+
+    //oNetRequest.setRawHeader("Authorization", "Bearer global-0b9ad652-9671-4cd8-86e9-e1b288dfe1da"); //token时用
+    oNetRequest.setRawHeader("CLIENTVERSION", ("V1"));
+    //oNetReply = oNetAccessManager.put(oNetRequest, *request.getRequestData());
+    //oNetReply = oNetAccessManager.post(oNetRequest, *request.getRequestData());
+    //oNetReply = oNetAccessManager.get(oNetRequest);
+    //oNetReply = oNetAccessManager.deleteResource(oNetRequest);
+
+    QNetworkAccessManager oNetAccessManager;
+    QNetworkReply* oNetReply = NULL;
+    QByteArray inputTmp;
+    if (thod == "POST")
+    {
+        oNetReply = oNetAccessManager.post(oNetRequest, strInput.toLocal8Bit());
+    }
+    else if (thod == "GET" )
+    {
+        oNetReply = oNetAccessManager.get(oNetRequest);
+    }
+
+    QEventLoop loop;
+    connect(oNetReply, SIGNAL(finished()), &loop, SLOT(quit()));
+    loop.exec();
+
+    //记录httpCode
+    int httpsCode = oNetReply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+//    qDebug() <<"httpsCode = " << httpsCode;
+    QNetworkReply::NetworkError e = oNetReply->error();
+    strResult = oNetReply->readAll();
+    if (e)
+    {
+        strMessage = oNetReply->errorString();
+    }
+    return httpsCode;
+}
+
 void mainwindow::button_test()
 {
     qDebug("button_test()");
+
+    QString strMessage;
+    QString strResult;
+    QString strUrl = "http://47.119.134.66:8080/index/";
+    QString strInput = " {\"id\":123} ";
+
+    SendAndGetText(strUrl, "POST", strInput, strMessage, strResult);
+    qDebug() <<"strResult = " << strResult;
 }
 
 /**

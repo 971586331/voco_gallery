@@ -35,6 +35,8 @@ public:
 
     Q_INVOKABLE void button_test();
 
+    int SendAndGetText(QString strUrl, QString thod, QString strInput, QString &strMessage,QString &strResult);
+
 signals:
     void userInfoChanged();
 
