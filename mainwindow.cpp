@@ -84,7 +84,18 @@ mainwindow::mainwindow(QObject *parent) : QObject(parent)
 
 }
 
-int mainwindow::SendAndGetText(QString strUrl, QString thod, QString strInput, QString &strMessage,QString &strResult)
+/**
+ * @brief mainwindow::SendAndGetText
+ * @param strUrl:restful接口
+ * @param thod:访问类型
+ * @param strInput:请求携带的参数
+ * @param strMessage:错误消息
+ * @param strResult:请求返回的数据
+ * @param resultType: HttpResponse时为"text/html; charset=utf-8"
+ *                      JsonResponse时为"application/json"
+ * @return
+ */
+int mainwindow::SendAndGetText(QString strUrl, QString thod, QString strInput, QString &strMessage,QString &strResult, QString &resultType)
 {
 
     QNetworkRequest oNetRequest;
@@ -122,6 +133,7 @@ int mainwindow::SendAndGetText(QString strUrl, QString thod, QString strInput, Q
 //    qDebug() <<"httpsCode = " << httpsCode;
     QNetworkReply::NetworkError e = oNetReply->error();
     strResult = oNetReply->readAll();
+    resultType = oNetReply->rawHeader("Content-Type");
     if (e)
     {
         strMessage = oNetReply->errorString();
@@ -137,8 +149,10 @@ void mainwindow::button_test()
     QString strResult;
     QString strUrl = "http://47.119.134.66:8080/index/";
     QString strInput = " {\"id\":123} ";
+    QString resultType;
 
-    SendAndGetText(strUrl, "POST", strInput, strMessage, strResult);
+    SendAndGetText(strUrl, "POST", strInput, strMessage, strResult, resultType);
+    qDebug() <<"resultType = " << resultType;
     qDebug() <<"strResult = " << strResult;
 }
 
