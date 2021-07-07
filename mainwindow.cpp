@@ -63,13 +63,13 @@ mainwindow::mainwindow(QObject *parent) : QObject(parent)
         g_rootObject->setProperty("current_user_name", tr("未指定"));
     }
 
-    QDateTime time = QDateTime::currentDateTime();   //获取当前时间
-    int time_int = time.toTime_t();
-    if( time_int > 1622520000 ) // 2021-06-01 12:00:00
-    {
-        QVariant msg;
-        QMetaObject::invokeMethod(g_rootObject, "permission", Q_ARG(QVariant, msg));
-    }
+//    QDateTime time = QDateTime::currentDateTime();   //获取当前时间
+//    int time_int = time.toTime_t();
+//    if( time_int > 1622520000 ) // 2021-06-01 12:00:00
+//    {
+//        QVariant msg;
+//        QMetaObject::invokeMethod(g_rootObject, "permission", Q_ARG(QVariant, msg));
+//    }
 
     QString dateTime;
     dateTime += __DATE__;
